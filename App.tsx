@@ -20,6 +20,7 @@ import { AuthProvider } from './src/context/AuthContext';
 import ProtectedRoute from './src/components/ProtectedRoute';
 import { ProfileData, SuggestedProfile, FeedPost } from './types';
 import BackgroundLayout from './src/components/BackgroundLayout'; // Import BackgroundLayout
+import InvasionCounter from '@/src/components/InvasionCounter'; // Importa o novo componente
 
 // Componente principal que contém a lógica de pesquisa e roteamento
 const MainAppContent: React.FC = () => {
@@ -229,6 +230,7 @@ const MainAppContent: React.FC = () => {
             setQuery={setSearchQuery} 
             isLoading={isLoading} 
           />
+          <InvasionCounter />
           <div className="mt-6 flex justify-center">
             <ConsentCheckbox checked={hasConsented} onChange={setHasConsented} />
           </div>
