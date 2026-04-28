@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Lock, CreditCard, QrCode, Shield, Share2, Trash2, MapPin, Check } from 'lucide-react';
+import { ChevronLeft, Lock, CreditCard, QrCode, Check } from 'lucide-react';
 
 const CHECKOUT_URL = 'https://go.perfectpay.com.br/PPU38CPUD1S';
 
@@ -42,12 +42,11 @@ const CheckoutPage: React.FC = () => {
   };
 
   const handleFinalize = () => {
-    // Redireciona para o link de checkout real
     window.location.href = CHECKOUT_URL;
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-300 font-sans pb-20">
+    <div className="min-h-screen bg-[#0a0a0a] text-gray-300 font-sans pb-10">
       {/* Topbar */}
       <div className="w-full bg-[#111] border-b border-gray-800 flex items-center justify-between px-4 sm:px-8 py-3">
         <button onClick={() => navigate(-1)} className="flex items-center text-xs text-gray-400 hover:text-white transition-colors uppercase tracking-wider font-semibold">
@@ -58,17 +57,13 @@ const CheckoutPage: React.FC = () => {
         <Lock className="w-4 h-4 text-gray-500" />
       </div>
 
-      {/* Banner */}
-      <div className="w-full bg-gradient-to-r from-gray-900 via-gray-800 to-black border-b border-yellow-600/30 py-12 relative overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, #d4af37 0%, transparent 60%)' }}></div>
-        <div className="relative z-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#f3e5ab] to-[#c5a059] uppercase tracking-tight drop-shadow-lg mb-2">
-            Finalize Sua Compra
-          </h1>
-          <p className="text-gray-400 text-lg md:text-xl font-medium">
-            Seu acesso exclusivo está reservado por tempo limitado.
-          </p>
-        </div>
+      {/* Banner Imagem */}
+      <div className="w-full max-w-4xl mx-auto flex justify-center bg-black">
+        <img 
+          src="/banner-topo.png" 
+          alt="Finalize a compra do Relatório Completo" 
+          className="w-full h-auto object-cover"
+        />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8">
@@ -183,7 +178,7 @@ const CheckoutPage: React.FC = () => {
                           <h3 className="text-sm font-bold text-white uppercase leading-tight pr-4">ADQUIRIR TAMBÉM ACESSO VITALÍCIO AO SPYGRAM PRO</h3>
                           <p className="text-sm font-bold text-green-500 mt-1">À VISTA POR R$ 9,90</p>
                         </div>
-                        <Shield className="w-8 h-8 text-yellow-500 opacity-80 hidden sm:block" />
+                        <img src="/logoapp.png" alt="SpyGram PRO" className="w-10 h-10 object-contain hidden sm:block" />
                       </div>
                       <p className="text-sm font-semibold text-red-500 mt-2">Tenha acesso permanente a ferramenta SpyGram PRO!</p>
                     </div>
@@ -200,7 +195,7 @@ const CheckoutPage: React.FC = () => {
                           <h3 className="text-sm font-bold text-white uppercase leading-tight pr-4">ADQUIRIR TAMBÉM ESPIÃO INSTAGRAM + FACEBOOK + WHATSAPP</h3>
                           <p className="text-sm font-bold text-green-500 mt-1">À VISTA POR R$ 19,90</p>
                         </div>
-                        <Share2 className="w-8 h-8 text-blue-400 opacity-80 hidden sm:block" />
+                        <img src="/orderredesociais.png" alt="Redes Sociais" className="w-10 h-10 object-contain hidden sm:block" />
                       </div>
                       <p className="text-sm font-semibold text-red-500 mt-2">Tenha acesso a todas as redes sociais de quem você quiser!</p>
                     </div>
@@ -217,7 +212,7 @@ const CheckoutPage: React.FC = () => {
                           <h3 className="text-sm font-bold text-white uppercase leading-tight pr-4">ADQUIRIR TAMBÉM RECUPERADOR DE MENSAGENS APAGADAS</h3>
                           <p className="text-sm font-bold text-green-500 mt-1">À VISTA POR R$ 15,90</p>
                         </div>
-                        <Trash2 className="w-8 h-8 text-pink-500 opacity-80 hidden sm:block" />
+                        <img src="/orderlixeira.png" alt="Recuperar Apagadas" className="w-10 h-10 object-contain hidden sm:block" />
                       </div>
                       <p className="text-sm font-semibold text-red-500 mt-2">Recupere todas as mensagens apagadas do instagram!</p>
                     </div>
@@ -234,7 +229,7 @@ const CheckoutPage: React.FC = () => {
                           <h3 className="text-sm font-bold text-white uppercase leading-tight pr-4">ADQUIRIR TAMBÉM RASTREAMENTO 24 HORAS</h3>
                           <p className="text-sm font-bold text-green-500 mt-1">À VISTA POR R$ 15,90</p>
                         </div>
-                        <MapPin className="w-8 h-8 text-purple-400 opacity-80 hidden sm:block" />
+                        <img src="/orderlocalizacao.png" alt="Rastreamento" className="w-10 h-10 object-contain hidden sm:block" />
                       </div>
                       <p className="text-sm font-semibold text-red-500 mt-2">Rastreie a pessoa que quiser usando somente o celular por tempo ilimitado! Saiba cada passo dela!</p>
                     </div>
@@ -251,7 +246,7 @@ const CheckoutPage: React.FC = () => {
               
               {/* Product Placeholder / Image */}
               <div className="w-full aspect-square bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-lg flex items-center justify-center mb-6">
-                <img src="/spygram_transparentebranco.png" alt="SpyGram Logo" className="w-2/3 opacity-80" />
+                <img src="/logoapp.png" alt="SpyGram Logo" className="w-1/2 opacity-90 object-contain" />
               </div>
 
               <h2 className="text-lg font-black text-white uppercase tracking-wider mb-6 border-b border-gray-800 pb-4">
@@ -300,6 +295,15 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Imagem do Final / Reviews */}
+        <div className="mt-16 w-full max-w-2xl mx-auto flex justify-center">
+          <img 
+            src="/embaixodobanner.png" 
+            alt="Mais de 12 mil pessoas aprovam" 
+            className="w-full h-auto object-contain rounded-xl shadow-lg"
+          />
         </div>
       </div>
     </div>
