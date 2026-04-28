@@ -10,6 +10,7 @@ import ServersPage from '@/src/pages/ServersPage';
 import CreditsPage from '@/src/pages/CreditsPage';
 import MessagesPage from '@/src/pages/MessagesPage';
 import ChatPage from '@/src/pages/ChatPage';
+import CheckoutPage from '@/src/pages/CheckoutPage'; // Nova página
 import ProgressBar from '@/src/components/ProgressBar';
 import InvasionSimulationPage from '@/src/pages/InvasionSimulationPage';
 import InvasionConcludedPage from '@/src/pages/InvasionConcludedPage';
@@ -19,8 +20,8 @@ import { fetchProfileData } from './src/services/profileService';
 import { AuthProvider } from './src/context/AuthContext';
 import ProtectedRoute from './src/components/ProtectedRoute';
 import { ProfileData, SuggestedProfile, FeedPost } from './types';
-import BackgroundLayout from './src/components/BackgroundLayout'; // Import BackgroundLayout
-import InvasionCounter from '@/src/components/InvasionCounter'; // Importa o novo componente
+import BackgroundLayout from './src/components/BackgroundLayout';
+import InvasionCounter from '@/src/components/InvasionCounter';
 
 // Componente principal que contém a lógica de pesquisa e roteamento
 const MainAppContent: React.FC = () => {
@@ -31,7 +32,7 @@ const MainAppContent: React.FC = () => {
   const [progressBarProgress, setProgressBarProgress] = useState(0);
   const [confirmedProfileData, setConfirmedProfileData] = useState<ProfileData | null>(null);
   const [confirmedSuggestions, setConfirmedSuggestions] = useState<SuggestedProfile[]>([]);
-  const [confirmedPosts, setConfirmedPosts] = useState<FeedPost[]>([]); // Novo estado para posts
+  const [confirmedPosts, setConfirmedPosts] = useState<FeedPost[]>([]);
   const navigate = useNavigate();
 
   // Efeito para simular o progresso da barra enquanto isLoading está ativo
@@ -72,7 +73,7 @@ const MainAppContent: React.FC = () => {
     setProgressBarProgress(0);
     setConfirmedProfileData(null);
     setConfirmedSuggestions([]);
-    setConfirmedPosts([]); // Limpa posts antigos
+    setConfirmedPosts([]);
 
     try {
       const fetchPromise = fetchProfileData(searchQuery.trim());
@@ -83,7 +84,7 @@ const MainAppContent: React.FC = () => {
       ]);
       setConfirmedProfileData(fetchResult.profile);
       setConfirmedSuggestions(fetchResult.suggestions);
-      setConfirmedPosts(fetchResult.posts); // Salva os posts
+      setConfirmedPosts(fetchResult.posts);
     } catch (err) {
       setError("Sistema sobrecarregado devido a grande quantidade de usuários, tente novamente mais tarde");
       console.error('Error during search process:', err);
@@ -132,7 +133,7 @@ const MainAppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-black">
       <ProgressBar progress={progressBarProgress} isVisible={isLoading} />
-      <div className="relative z-20 text-white font-sans flex flex-col items-center px-4 sm:px-8 pt-12 pb-8 w-full"> {/* Ajustado padding */}
+      <div className="relative z-20 text-white font-sans flex flex-col items-center px-4 sm:px-8 pt-12 pb-8 w-full"> 
         <style>{`
           @keyframes fade-in {
             from { opacity: 0; transform: translateY(20px); }
@@ -196,7 +197,7 @@ const MainAppContent: React.FC = () => {
           }
         `}</style>
         
-        <header className="text-center mb-8 relative w-full max-w-xl"> {/* Ajustado margin */}
+        <header className="text-center mb-8 relative w-full max-w-xl">
           <div className="relative group mx-auto w-fit mb-4">
             <div className="absolute -inset-0.5 blur animate-tilt animate-blob animate-logo-background-pulse logo-radial-background"></div>
             
@@ -204,11 +205,9 @@ const MainAppContent: React.FC = () => {
               src="/spygram_transparentebranco.png"
               alt="SpyGram Logo"
               className="h-20 md:h-32 relative z-10 animate-logo-float-pulse rounded-full animate-logo-entrance" 
-              /* Ajustado tamanho mobile */
             />
           </div>
           
-          {/* Texto original restaurado */}
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4">
             <span className="inline-block bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-transparent bg-clip-text">
               SPYGRAM
@@ -262,7 +261,6 @@ const App: React.FC = () => {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Rotas que DEVEM ter o background */}
           <Route path="/" element={<BackgroundLayout><MainAppContent /></BackgroundLayout>} />
           <Route path="/login" element={<BackgroundLayout><LoginPage /></BackgroundLayout>} />
           <Route 
@@ -290,8 +288,19 @@ const App: React.FC = () => {
             } 
           />
           
-          {/* Rotas que NÃO DEVEM ter o background (Instagram Mockups) */}
+          {/* Rotas de Mockup & Nova Rota de Checkout */}
           <Route path="/invasion-simulation" element={<InvasionSimulationPage />} />
+          
+          {/* Rota do Checkout isolada para parecer página nativa */}
+          <Route 
+            path="/checkout" 
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            } 
+          />
+          
           <Route 
             path="/messages" 
             element={
