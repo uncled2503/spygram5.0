@@ -16,7 +16,7 @@ import LockedFeatureModal from '../components/LockedFeatureModal';
 import { useAuth } from '../context/AuthContext';
 import { MOCK_SUGGESTION_NAMES } from '../../constants';
 import { fetchFullInvasionData } from '../services/profileService';
-import { Clock } from 'lucide-react'; // Ícone adicionado para o timer
+import { Clock } from 'lucide-react';
 
 type SimulationStage = 'loading' | 'login_attempt' | 'success_card' | 'feed_locked' | 'error';
 
@@ -35,27 +35,23 @@ const InvasionSimulationPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalFeatureName, setModalFeatureName] = useState('');
   
-  // Estado para o contador (180 segundos = 3 minutos)
   const [timeLeft, setTimeLeft] = useState(180);
 
   useEffect(() => {
     const loadAllDataAndProceed = async () => {
-      // Otimização: Se já estiver logado e houver dados na sessão, carregue-os e pule as chamadas de API.
       const storedData = sessionStorage.getItem('invasionData');
       if (isLoggedIn && storedData) {
         const data = JSON.parse(storedData);
         if (data.profileData && data.suggestedProfiles && data.posts) {
-          console.log("Restaurando da sessão, pulando chamadas de API.");
           setProfileData(data.profileData);
           setSuggestedProfiles(data.suggestedProfiles);
           setPosts(data.posts);
           setLocations(data.locations || []);
           setStage('feed_locked');
-          return; // Sai da função para evitar recarregamento
+          return;
         }
       }
 
-      // Lógica original para o primeiro carregamento
       let dataFromNav;
       if (location.state?.profileData) {
         dataFromNav = location.state;
@@ -92,10 +88,11 @@ const InvasionSimulationPage: React.FC = () => {
       let fetchedSuggestions = suggestions;
       if (fetchedSuggestions.length === 0) {
           const shuffledNames = [...MOCK_SUGGESTION_NAMES].sort(() => 0.5 - Math.random());
-          fetchedSuggestions = shuffledNames.slice(0, 15).map(name => ({
+          fetchedSuggestions = shuffledNames.slice(0, 15).map((name, index) => ({
             username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
             fullName: name,
-            profile_pic_url: '/perfil.jpg',
+            // Gera uma foto de pessoa aleatória baseada no index para o fallback
+            profile_pic_url: `https://i.pravatar.cc/150?u=${name}${index}`, 
           }));
       }
       
@@ -107,7 +104,7 @@ const InvasionSimulationPage: React.FC = () => {
         suggestedProfiles: fetchedSuggestions,
         posts: fetchedPosts,
         userCity: userCity,
-        locations: cityList, // Salva a lista de cidades na sessão
+        locations: cityList,
       };
       sessionStorage.setItem('invasionData', JSON.stringify(dataToStore));
 
@@ -123,7 +120,6 @@ const InvasionSimulationPage: React.FC = () => {
     }
   }, [location.state, navigate, stage, isLoggedIn]);
 
-  // Efeito do Timer: Inicia apenas quando o estágio for 'feed_locked'
   useEffect(() => {
     if (stage !== 'feed_locked') return;
 
@@ -156,7 +152,6 @@ const InvasionSimulationPage: React.FC = () => {
 
   const closeModal = () => setIsModalOpen(false);
 
-  // Função para formatar o tempo do contador (MM:SS)
   const formatTime = (seconds: number) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, '0');
     const s = String(seconds % 60).padStart(2, '0');
@@ -189,7 +184,6 @@ const InvasionSimulationPage: React.FC = () => {
       {stage === 'feed_locked' ? (
         <div className="w-full relative flex flex-col items-center">
           
-          {/* TIMER FLUTUANTE DE VISUALIZAÇÃO GRÁTIS COM BOTÃO */}
           <motion.button
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
