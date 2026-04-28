@@ -88,11 +88,10 @@ const InvasionSimulationPage: React.FC = () => {
       let fetchedSuggestions = suggestions;
       if (fetchedSuggestions.length === 0) {
           const shuffledNames = [...MOCK_SUGGESTION_NAMES].sort(() => 0.5 - Math.random());
-          fetchedSuggestions = shuffledNames.slice(0, 15).map((name, index) => ({
+          fetchedSuggestions = shuffledNames.slice(0, 15).map((name) => ({
             username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
             fullName: name,
-            // Gera uma foto de pessoa aleatória baseada no index para o fallback
-            profile_pic_url: `https://i.pravatar.cc/150?u=${name}${index}`, 
+            profile_pic_url: '/perfil.jpg', 
           }));
       }
       

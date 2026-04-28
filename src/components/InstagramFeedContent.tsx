@@ -112,25 +112,15 @@ const RealPost: React.FC<{ postData: FeedPost; location?: string } & ClickablePr
   );
 };
 
-// Agora o LockedPost aceita um SuggestedProfile opcional para mostrar a foto/nome no cabeçalho
-const LockedPost: React.FC<{ location?: string, profile?: SuggestedProfile }> = ({ location, profile }) => {
-  const maskedUsername = profile ? maskUsername(profile.username) : 'username';
-  
+// Post bloqueado restaurado para usar a div e fundo cinza
+const LockedPost: React.FC<{ location?: string }> = ({ location }) => {
   return (
     <div className="border-b border-gray-800 mb-4">
       <div className="flex items-center justify-between p-3">
         <div className="flex items-center space-x-3">
-          {profile?.profile_pic_url ? (
-            <img src={profile.profile_pic_url} alt={profile.username} className="w-8 h-8 rounded-full object-cover" />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-gray-700"></div>
-          )}
+          <div className="w-8 h-8 rounded-full bg-gray-700"></div>
           <div>
-            {profile ? (
-              <p className="text-sm font-semibold text-white">{maskedUsername}</p>
-            ) : (
-              <p className="text-sm font-semibold text-white bg-gray-700 rounded w-20 h-4"></p>
-            )}
+            <p className="text-sm font-semibold text-white bg-gray-700 rounded w-20 h-4"></p>
             {location && <p className="text-xs text-gray-400 mt-1">{location}</p>}
           </div>
         </div>
@@ -153,7 +143,7 @@ const LockedPost: React.FC<{ location?: string, profile?: SuggestedProfile }> = 
       </div>
       <div className="px-3 pb-3 text-xs space-y-1 blur-sm select-none pointer-events-none">
         <p className="font-semibold text-white mb-1">{Math.floor(Math.random() * 2000) + 100} curtidas</p>
-        <p className="text-white"><span className="font-semibold mr-1">{maskedUsername}</span><span>Lorem ipsum dolor sit amet, consectetur...</span></p>
+        <p className="text-white"><span className="font-semibold mr-1">username</span><span>Lorem ipsum dolor sit amet, consectetur...</span></p>
         <p className="text-gray-500 mt-1">Ver todos os {Math.floor(Math.random() * 50) + 10} comentários</p>
       </div>
     </div>
@@ -201,7 +191,6 @@ const InstagramFeedContent: React.FC<InstagramFeedContentProps> = ({ profileData
         )) : [1, 2, 3].map((item, index) => (
           <LockedPost 
             key={item} 
-            profile={suggestedProfiles[index]}
             location={locations.length > 0 ? locations[index % locations.length] : undefined} 
           />
         ))}
