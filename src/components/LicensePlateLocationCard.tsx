@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Car, MapPin, Lock } from 'lucide-react';
+import { Car, MapPin } from 'lucide-react';
 import ShineButton from './ui/ShineButton';
 
 interface LicensePlateLocationCardProps {
@@ -30,28 +30,13 @@ const LicensePlateLocationCard: React.FC<LicensePlateLocationCardProps> = ({ onU
           **NOVIDADE!** Descubra a localização exata do veículo do seu alvo, apenas com a placa. Rastreamento em tempo real via satélite.
         </p>
         
-        {/* Mockup de Imagem com Bloqueio */}
-        <div className="relative w-full max-w-md mx-auto mb-8 rounded-2xl overflow-hidden">
-          
-          {/* Imagem de Fundo (Sem Blur) */}
-          <div className="relative w-full h-auto bg-white/5 rounded-2xl overflow-hidden border border-gray-800 shadow-xl select-none pointer-events-none p-4">
-            <img 
-              src="/autosat-monitoramento-rastreamento.png" 
-              alt="Rastreamento Veicular" 
-              className="w-full h-auto object-contain drop-shadow-2xl" 
-            />
-          </div>
-
-          {/* Overlay de Bloqueio focado no meio */}
-          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none">
-             <div className="bg-black/70 p-5 rounded-full backdrop-blur-sm border-2 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]">
-               <Lock className="w-12 h-12 text-blue-500" />
-             </div>
-             <div className="mt-3 bg-black/80 px-4 py-1.5 rounded-full border border-blue-500/50">
-                <span className="text-blue-400 font-bold text-sm">LOCALIZAÇÃO ENCONTRADA</span>
-             </div>
-          </div>
-
+        {/* Imagem Limpa */}
+        <div className="relative w-full max-w-md mx-auto mb-8">
+          <img 
+            src="/autosat-monitoramento-rastreamento.png" 
+            alt="Rastreamento Veicular" 
+            className="w-full h-auto object-contain drop-shadow-2xl select-none pointer-events-none" 
+          />
         </div>
 
         <p className="text-xl text-yellow-300 font-bold mb-6">
@@ -60,7 +45,6 @@ const LicensePlateLocationCard: React.FC<LicensePlateLocationCardProps> = ({ onU
 
         <ShineButton 
           onClick={onUnlockClick} 
-          // Sobrescreve o BG e o anel de foco (ring)
           className="w-full bg-blue-600 focus:ring-blue-500 active:scale-95"
           shineColorClasses="bg-blue-600"
         >
