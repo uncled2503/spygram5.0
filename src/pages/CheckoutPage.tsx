@@ -8,6 +8,15 @@ const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<'cartao' | 'pix'>('pix');
   
+  // Estado dos campos do formulário
+  const [formData, setFormData] = useState({
+    nome: '',
+    email: '',
+    confirmEmail: '',
+    whatsapp: '',
+    documento: ''
+  });
+  
   // Estado dos Order Bumps
   const [bumps, setBumps] = useState({
     pro: false,
@@ -45,6 +54,57 @@ const CheckoutPage: React.FC = () => {
     window.location.href = CHECKOUT_URL;
   };
 
+  // Funções de formatação (Máscaras)
+  const formatWhatsApp = (value: string) => {
+    let v = value.replace(/\D/g, ""); // Remove tudo o que não é dígito
+    if (v.length > 11) v = v.substring(0, 11); // Limita a 11 dígitos
+    
+    if (v.length > 2) {
+      v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+    }
+    if (v.length > 9) {
+      v = v.replace(/(\d{5})(\d)/, "$1-$2");
+    } else if (v.length > 8) {
+      v = v.replace(/(\d{4})(\d)/, "$1-$2"); // Para números fixos (8 dígitos)
+    }
+    return v;
+  };
+
+  const formatDocumento = (value: string) => {
+    let v = value.replace(/\D/g, ""); // Remove tudo o que não é dígito
+    
+    if (v.length <= 11) {
+      // Máscara de CPF: 000.000.000-00
+      v = v.replace(/(\d{3})(\d)/, "$1.$2");
+      v = v.replace(/(\d{3})(\d)/, "$1.$2");
+      v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    } else {
+      // Máscara de CNPJ: 00.000.000/0000-00
+      if (v.length > 14) v = v.substring(0, 14);
+      v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+      v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+      v = v.replace(/(\d{4})(\d)/, "$1-$2");
+    }
+    return v;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    let formattedValue = value;
+    if (name === 'whatsapp') {
+      formattedValue = formatWhatsApp(value);
+    } else if (name === 'documento') {
+      formattedValue = formatDocumento(value);
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: formattedValue
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-300 font-sans pb-10">
       {/* Topbar */}
@@ -57,7 +117,7 @@ const CheckoutPage: React.FC = () => {
         <Lock className="w-4 h-4 text-gray-500" />
       </div>
 
-      {/* Banner Principal */}
+      {/* Banner Principal e Reviews */}
       <div className="w-full bg-[#0a0a0a] flex flex-col items-center pt-6 pb-6 px-4 border-b border-gray-800">
         <img 
           src="/banner-topo.png" 
@@ -90,26 +150,63 @@ const CheckoutPage: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Nome Completo</label>
-                  <input type="text" placeholder="Digite seu nome completo" className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" />
+                  <input 
+                    type="text" 
+                    name="nome"
+                    value={formData.nome}
+                    onChange={handleChange}
+                    placeholder="Digite seu nome completo" 
+                    className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" 
+                  />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">E-mail</label>
-                    <input type="email" placeholder="seu@email.com" className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" />
+                    <input 
+                      type="email" 
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="seu@email.com" 
+                      className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" 
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Confirmar E-mail</label>
-                    <input type="email" placeholder="repita seu e-mail" className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" />
+                    <input 
+                      type="email" 
+                      name="confirmEmail"
+                      value={formData.confirmEmail}
+                      onChange={handleChange}
+                      placeholder="repita seu e-mail" 
+                      className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" 
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">WhatsApp</label>
-                    <input type="text" placeholder="(00) 00000-0000" className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" />
+                    <input 
+                      type="tel" 
+                      name="whatsapp"
+                      value={formData.whatsapp}
+                      onChange={handleChange}
+                      inputMode="numeric"
+                      placeholder="(00) 00000-0000" 
+                      className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" 
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">CPF ou CNPJ</label>
-                    <input type="text" placeholder="000.000.000-00" className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" />
+                    <input 
+                      type="tel" 
+                      name="documento"
+                      value={formData.documento}
+                      onChange={handleChange}
+                      inputMode="numeric"
+                      placeholder="000.000.000-00" 
+                      className="w-full bg-[#0a0a0a] border border-gray-800 rounded-lg px-4 py-3 text-white focus:border-[#d4af37] focus:outline-none transition-colors" 
+                    />
                   </div>
                 </div>
               </div>
@@ -169,61 +266,61 @@ const CheckoutPage: React.FC = () => {
                 <div className="space-y-4">
                   {/* BUMP 1: SpyGram PRO (Vitalício) */}
                   <div onClick={() => handleToggleBump('pro')} className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3 sm:gap-4 ${bumps.pro ? 'bg-[#1a1a1a] border-[#d4af37]' : 'bg-[#0a0a0a] border-gray-800 hover:border-gray-700'}`}>
-                    <div className="flex-shrink-0 bg-white/5 rounded-md p-1.5 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16">
+                    <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-white/5 rounded-lg p-2 flex items-center justify-center">
                       <img src="/Vitalicio.png" alt="SpyGram PRO" className="w-full h-full object-contain" onError={(e) => { e.currentTarget.src = '/logoapp.png'; }} />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-[11px] sm:text-[13px] font-bold text-white uppercase leading-tight">ADQUIRIR TAMBÉM ACESSO VITALÍCIO AO SPYGRAM PRO</h3>
-                      <p className="text-[12px] sm:text-[14px] font-bold text-green-500 mt-1">À VISTA POR R$ 9,90</p>
-                      <p className="text-[10px] sm:text-[12px] font-semibold text-red-500 mt-1 leading-tight">Tenha acesso permanente a ferramenta SpyGram PRO!</p>
+                      <h3 className="text-[12px] sm:text-[14px] font-bold text-white uppercase leading-tight">ADQUIRIR TAMBÉM ACESSO VITALÍCIO AO SPYGRAM PRO</h3>
+                      <p className="text-[13px] sm:text-[15px] font-bold text-green-500 mt-1">À VISTA POR R$ 9,90</p>
+                      <p className="text-[10px] sm:text-xs font-semibold text-gray-400 mt-1 leading-tight">Tenha acesso permanente a ferramenta SpyGram PRO!</p>
                     </div>
-                    <div className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 rounded flex items-center justify-center border transition-colors ${bumps.pro ? 'bg-[#d4af37] border-[#d4af37]' : 'bg-[#111] border-gray-600'}`}>
-                      {bumps.pro && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-black" />}
+                    <div className={`w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 rounded flex items-center justify-center border transition-colors ${bumps.pro ? 'bg-[#d4af37] border-[#d4af37]' : 'bg-[#111] border-gray-600'}`}>
+                      {bumps.pro && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-black font-bold" />}
                     </div>
                   </div>
 
                   {/* BUMP 2: Redes Sociais */}
                   <div onClick={() => handleToggleBump('social')} className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3 sm:gap-4 ${bumps.social ? 'bg-[#1a1a1a] border-[#d4af37]' : 'bg-[#0a0a0a] border-gray-800 hover:border-gray-700'}`}>
-                    <div className="flex-shrink-0 bg-white/5 rounded-md p-1.5 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16">
+                    <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-white/5 rounded-lg p-2 flex items-center justify-center">
                       <img src="/orderredesociais.png" alt="Redes Sociais" className="w-full h-full object-contain" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-[11px] sm:text-[13px] font-bold text-white uppercase leading-tight">ADQUIRIR TAMBÉM ESPIÃO INSTAGRAM + FACEBOOK + WHATSAPP</h3>
-                      <p className="text-[12px] sm:text-[14px] font-bold text-green-500 mt-1">À VISTA POR R$ 19,90</p>
-                      <p className="text-[10px] sm:text-[12px] font-semibold text-red-500 mt-1 leading-tight">Tenha acesso a todas as redes sociais de quem você quiser!</p>
+                      <h3 className="text-[12px] sm:text-[14px] font-bold text-white uppercase leading-tight">ADQUIRIR TAMBÉM ESPIÃO INSTAGRAM + FACEBOOK + WHATSAPP</h3>
+                      <p className="text-[13px] sm:text-[15px] font-bold text-green-500 mt-1">À VISTA POR R$ 19,90</p>
+                      <p className="text-[10px] sm:text-xs font-semibold text-gray-400 mt-1 leading-tight">Tenha acesso a todas as redes sociais de quem você quiser!</p>
                     </div>
-                    <div className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 rounded flex items-center justify-center border transition-colors ${bumps.social ? 'bg-[#d4af37] border-[#d4af37]' : 'bg-[#111] border-gray-600'}`}>
-                      {bumps.social && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-black" />}
+                    <div className={`w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 rounded flex items-center justify-center border transition-colors ${bumps.social ? 'bg-[#d4af37] border-[#d4af37]' : 'bg-[#111] border-gray-600'}`}>
+                      {bumps.social && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-black font-bold" />}
                     </div>
                   </div>
 
                   {/* BUMP 3: Mensagens Apagadas */}
                   <div onClick={() => handleToggleBump('recover')} className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3 sm:gap-4 ${bumps.recover ? 'bg-[#1a1a1a] border-[#d4af37]' : 'bg-[#0a0a0a] border-gray-800 hover:border-gray-700'}`}>
-                    <div className="flex-shrink-0 bg-white/5 rounded-md p-1.5 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16">
+                    <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-white/5 rounded-lg p-2 flex items-center justify-center">
                       <img src="/orderlixeira.png" alt="Recuperar Apagadas" className="w-full h-full object-contain" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-[11px] sm:text-[13px] font-bold text-white uppercase leading-tight">ADQUIRIR TAMBÉM RECUPERADOR DE MENSAGENS APAGADAS</h3>
-                      <p className="text-[12px] sm:text-[14px] font-bold text-green-500 mt-1">À VISTA POR R$ 15,90</p>
-                      <p className="text-[10px] sm:text-[12px] font-semibold text-red-500 mt-1 leading-tight">Recupere todas as mensagens apagadas do instagram!</p>
+                      <h3 className="text-[12px] sm:text-[14px] font-bold text-white uppercase leading-tight">ADQUIRIR TAMBÉM RECUPERADOR DE MENSAGENS APAGADAS</h3>
+                      <p className="text-[13px] sm:text-[15px] font-bold text-green-500 mt-1">À VISTA POR R$ 15,90</p>
+                      <p className="text-[10px] sm:text-xs font-semibold text-gray-400 mt-1 leading-tight">Recupere todas as mensagens apagadas do instagram!</p>
                     </div>
-                    <div className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 rounded flex items-center justify-center border transition-colors ${bumps.recover ? 'bg-[#d4af37] border-[#d4af37]' : 'bg-[#111] border-gray-600'}`}>
-                      {bumps.recover && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-black" />}
+                    <div className={`w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 rounded flex items-center justify-center border transition-colors ${bumps.recover ? 'bg-[#d4af37] border-[#d4af37]' : 'bg-[#111] border-gray-600'}`}>
+                      {bumps.recover && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-black font-bold" />}
                     </div>
                   </div>
 
                   {/* BUMP 4: Rastreamento */}
                   <div onClick={() => handleToggleBump('track')} className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3 sm:gap-4 ${bumps.track ? 'bg-[#1a1a1a] border-[#d4af37]' : 'bg-[#0a0a0a] border-gray-800 hover:border-gray-700'}`}>
-                    <div className="flex-shrink-0 bg-white/5 rounded-md p-1.5 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16">
+                    <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-white/5 rounded-lg p-2 flex items-center justify-center">
                       <img src="/orderlocalizacao.png" alt="Rastreamento" className="w-full h-full object-contain" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-[11px] sm:text-[13px] font-bold text-white uppercase leading-tight">ADQUIRIR TAMBÉM RASTREAMENTO 24 HORAS</h3>
-                      <p className="text-[12px] sm:text-[14px] font-bold text-green-500 mt-1">À VISTA POR R$ 15,90</p>
-                      <p className="text-[10px] sm:text-[12px] font-semibold text-red-500 mt-1 leading-tight">Rastreie a pessoa que quiser usando somente o celular por tempo ilimitado!</p>
+                      <h3 className="text-[12px] sm:text-[14px] font-bold text-white uppercase leading-tight">ADQUIRIR TAMBÉM RASTREAMENTO 24 HORAS</h3>
+                      <p className="text-[13px] sm:text-[15px] font-bold text-green-500 mt-1">À VISTA POR R$ 15,90</p>
+                      <p className="text-[10px] sm:text-xs font-semibold text-gray-400 mt-1 leading-tight">Rastreie a pessoa que quiser por tempo ilimitado!</p>
                     </div>
-                    <div className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 rounded flex items-center justify-center border transition-colors ${bumps.track ? 'bg-[#d4af37] border-[#d4af37]' : 'bg-[#111] border-gray-600'}`}>
-                      {bumps.track && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-black" />}
+                    <div className={`w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 rounded flex items-center justify-center border transition-colors ${bumps.track ? 'bg-[#d4af37] border-[#d4af37]' : 'bg-[#111] border-gray-600'}`}>
+                      {bumps.track && <Check className="w-4 h-4 sm:w-5 sm:h-5 text-black font-bold" />}
                     </div>
                   </div>
 
