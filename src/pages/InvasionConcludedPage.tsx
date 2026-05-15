@@ -111,7 +111,10 @@ const InvasionConcludedPage: React.FC = () => {
           onUnlockClick={handleUnlockClick} 
         /> 
         
-        <LicensePlateLocationCard onUnlockClick={handleUnlockClick} />
+        <LicensePlateLocationCard 
+          onUnlockClick={handleUnlockClick} 
+          userCity={userCity} // Passando a cidade
+        />
         
         <RecoveredDataCard onUnlockClick={handleUnlockClick} />
 
