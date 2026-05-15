@@ -35,7 +35,8 @@ const InvasionSimulationPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalFeatureName, setModalFeatureName] = useState('');
   
-  const [timeLeft, setTimeLeft] = useState(180);
+  // Alterado de 180 (3min) para 90 (1.5min)
+  const [timeLeft, setTimeLeft] = useState(90);
 
   useEffect(() => {
     const loadAllDataAndProceed = async () => {
