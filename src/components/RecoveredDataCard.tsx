@@ -91,8 +91,8 @@ const RecoveredDataCard: React.FC<RecoveredDataCardProps> = ({ onUnlockClick }) 
         {/* Galeria de Fotos Recuperadas (Layout Vertical Centralizado) */}
         {selectedImages.length > 0 && (
           <div className="flex flex-col items-center justify-center gap-4 mb-8 bg-black/60 p-8 rounded-xl border border-red-700/50 max-w-sm mx-auto shadow-lg shadow-red-500/10">
-            {/* Miniaturas Sobrepostas com mais espaço */}
-            <div className="flex -space-x-8 ml-6"> {/* Espaçamento negativo reduzido e offset ajustado */}
+            {/* Miniaturas com sobreposição reduzida (mais separadas) */}
+            <div className="flex -space-x-3 ml-3"> {/* Reduzi o overlap de -8 para -3 e ajustei o margin lateral */}
               {selectedImages.map((src, index) => (
                 <div 
                   key={index} 
