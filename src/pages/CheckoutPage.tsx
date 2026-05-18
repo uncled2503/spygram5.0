@@ -104,7 +104,7 @@ const CheckoutPage: React.FC = () => {
       <SalesNotification />
       
       {/* Top Countdown Banner */}
-      <div className="w-full bg-[#f15c5c] text-white py-3 text-center text-[12px] font-bold uppercase flex flex-col items-center justify-center gap-1 px-4 opacity-90">
+      <div className="w-full bg-[#f15c5c] text-white py-3 text-center text-[12px] font-bold uppercase flex flex-col items-center justify-center gap-1 px-4 opacity-90 relative z-10">
         <span className="text-base font-mono">{formatTimer(timeLeft)}</span>
         <div className="flex items-center gap-1.5">
             <Clock className="w-4 h-4" />
@@ -113,11 +113,21 @@ const CheckoutPage: React.FC = () => {
       </div>
 
       {/* Hero Section */}
-      <div className="w-full bg-white pb-8">
-        <div className="w-full max-w-lg mx-auto flex flex-col items-center">
+      <div className="w-full bg-white pb-8 relative overflow-hidden">
+        {/* Background Blurred Banner */}
+        <div 
+          className="absolute inset-0 z-0 opacity-30 grayscale blur-3xl scale-110 pointer-events-none"
+          style={{ 
+            backgroundImage: 'url(/banner-topo.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top'
+          }}
+        />
+
+        <div className="w-full max-w-lg mx-auto flex flex-col items-center relative z-10">
             {/* Collage and Texts */}
             <div className="w-full relative px-4 pt-4">
-                <img src="/banner-topo.png" alt="SpyGram Community" className="w-full h-auto" />
+                <img src="/banner-topo.png" alt="SpyGram Community" className="w-full h-auto relative z-10" />
                 <div className="text-center mt-4">
                     <h1 className="text-xl font-black text-[#111] mb-1.5">+12,3mil pessoas utilizam e aprovam o SpyGram®.</h1>
                     <p className="text-[#888] text-[11px] font-medium max-w-[320px] mx-auto leading-snug">
