@@ -206,7 +206,7 @@ const CheckoutPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Step 2: Payment Desktop */}
+                {/* Step 2: Payment Desktop (SOMENTE PIX) */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="p-8">
                         <div className="flex items-center gap-4 mb-8">
@@ -214,20 +214,11 @@ const CheckoutPage: React.FC = () => {
                             <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest">PAGAMENTO</h2>
                         </div>
                         
-                        {/* Tabs Mockup */}
-                        <div className="grid grid-cols-4 gap-2 mb-6">
-                            <div className="border border-gray-200 rounded-lg py-3 flex flex-col items-center gap-1 cursor-not-allowed opacity-50 bg-gray-50">
-                                <CreditCard size={18} /> <span className="text-[10px] font-bold">Cartão</span>
-                            </div>
-                            <div className="border border-gray-200 rounded-lg py-3 flex flex-col items-center gap-1 cursor-not-allowed opacity-50 bg-gray-50">
-                                <Banknote size={18} /> <span className="text-[10px] font-bold">Boleto</span>
-                            </div>
+                        {/* Tabs Mockup - Somente Pix */}
+                        <div className="grid grid-cols-1 gap-2 mb-6 max-w-[150px]">
                             <div className="border-2 border-green-500 rounded-lg py-3 flex flex-col items-center gap-1 bg-white relative">
                                 <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-0.5"><Check size={10} /></div>
                                 <QrCode size={18} className="text-green-500" /> <span className="text-[10px] font-bold">Pix</span>
-                            </div>
-                            <div className="border border-gray-200 rounded-lg py-3 flex flex-col items-center gap-1 cursor-not-allowed opacity-50 bg-gray-50">
-                                <div className="w-12 h-4 bg-gray-400 rounded-sm"></div> <span className="text-[10px] font-bold">PicPay</span>
                             </div>
                         </div>
 
@@ -374,14 +365,14 @@ const CheckoutPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Step 2 Mobile */}
+          {/* Step 2 Mobile (SOMENTE PIX EM TEXTO) */}
           <section className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-6 pt-6 pb-6">
               <div className="bg-[#bdbdbd] text-white px-6 py-1 rounded-full w-fit flex items-center gap-3 mb-6">
                   <span className="font-black text-sm">2</span><h2 className="text-xs font-black uppercase tracking-widest">PAGAMENTO</h2>
               </div>
               <div className="bg-[#fcfcfc] border border-gray-100 rounded-lg p-4 mb-6 text-[11px] text-gray-500 space-y-4">
-                  <p>01. Pagamento em segundos, sem complicações</p><p>02. Basta escanear o QRCode que iremos gerar sua compra</p><p>03. O PIX é 100% seguro.</p>
+                  <p>01. Pagamento em segundos, sem complicações (PIX)</p><p>02. Basta escanear o QRCode que iremos gerar sua compra</p><p>03. O PIX é 100% seguro.</p>
               </div>
               <div><label className="text-sm font-black text-gray-700 mb-1.5 block">CPF ou CNPJ</label><input type="tel" placeholder="CPF ou CNPJ" className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm outline-none" /></div>
             </div>
