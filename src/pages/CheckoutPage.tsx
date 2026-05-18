@@ -12,6 +12,7 @@ const CheckoutPage: React.FC = () => {
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
+    confirmarEmail: '',
     whatsapp: '',
     documento: ''
   });
@@ -166,11 +167,19 @@ const CheckoutPage: React.FC = () => {
                                 <label className="text-xs font-black text-gray-700 uppercase mb-2 block">Nome completo</label>
                                 <input type="text" name="nome" value={formData.nome} onChange={handleChange} placeholder="Digite seu nome completo" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:border-purple-500 outline-none" />
                             </div>
+                            <div className="col-span-2">
+                                <label className="text-xs font-black text-gray-700 uppercase mb-2 block">CPF ou CNPJ</label>
+                                <input type="text" name="documento" value={formData.documento} onChange={handleChange} placeholder="CPF ou CNPJ" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:border-purple-500 outline-none" />
+                            </div>
                             <div>
                                 <label className="text-xs font-black text-gray-700 uppercase mb-2 block">E-mail</label>
                                 <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="E-mail" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:border-purple-500 outline-none" />
                             </div>
                             <div>
+                                <label className="text-xs font-black text-gray-700 uppercase mb-2 block">Confirmar E-mail</label>
+                                <input type="email" name="confirmarEmail" value={formData.confirmarEmail} onChange={handleChange} placeholder="Confirmar E-mail" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:border-purple-500 outline-none" />
+                            </div>
+                            <div className="col-span-2">
                                 <label className="text-xs font-black text-gray-700 uppercase mb-2 block">Telefone</label>
                                 <input type="tel" name="whatsapp" value={formData.whatsapp} onChange={handleChange} placeholder="Telefone" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:border-purple-500 outline-none" />
                             </div>
@@ -198,11 +207,6 @@ const CheckoutPage: React.FC = () => {
                             <p>01. Pagamento em segundos, sem complicações</p>
                             <p>02. Basta escanear, com o aplicativo do seu banco, o QRCode que iremos gerar sua compra</p>
                             <p>03. O PIX foi desenvolvido pelo Banco Central para facilitar suas compras e é 100% seguro.</p>
-                        </div>
-
-                        <div className="max-w-md">
-                            <label className="text-xs font-black text-gray-700 uppercase mb-2 block">CPF ou CNPJ</label>
-                            <input type="tel" placeholder="CPF ou CNPJ" className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm outline-none" />
                         </div>
                     </div>
                 </div>
@@ -325,7 +329,9 @@ const CheckoutPage: React.FC = () => {
               </div>
               <div className="space-y-5">
                   <div><label className="text-sm font-black text-gray-700 mb-1.5 block">Nome completo</label><input type="text" name="nome" value={formData.nome} onChange={handleChange} placeholder="Digite seu nome completo" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none" /></div>
+                  <div><label className="text-sm font-black text-gray-700 mb-1.5 block">CPF ou CNPJ</label><input type="text" name="documento" value={formData.documento} onChange={handleChange} placeholder="CPF ou CNPJ" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none" /></div>
                   <div><label className="text-sm font-black text-gray-700 mb-1.5 block">E-mail</label><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="E-mail" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none" /></div>
+                  <div><label className="text-sm font-black text-gray-700 mb-1.5 block">Confirmar E-mail</label><input type="email" name="confirmarEmail" value={formData.confirmarEmail} onChange={handleChange} placeholder="Confirmar E-mail" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none" /></div>
                   <div><label className="text-sm font-black text-gray-700 mb-1.5 block">Telefone</label><input type="tel" name="whatsapp" value={formData.whatsapp} onChange={handleChange} placeholder="Telefone" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none" /></div>
               </div>
             </div>
@@ -340,7 +346,6 @@ const CheckoutPage: React.FC = () => {
               <div className="bg-[#fcfcfc] border border-gray-100 rounded-lg p-4 mb-6 text-[11px] text-gray-500 space-y-4">
                   <p>01. Pagamento em segundos, sem complicações (PIX)</p><p>02. Basta escanear o QRCode que iremos gerar sua compra</p><p>03. O PIX é 100% seguro.</p>
               </div>
-              <div><label className="text-sm font-black text-gray-700 mb-1.5 block">CPF ou CNPJ</label><input type="tel" placeholder="CPF ou CNPJ" className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm outline-none" /></div>
             </div>
           </section>
 
