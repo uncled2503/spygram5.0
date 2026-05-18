@@ -7,7 +7,6 @@ const CHECKOUT_URL = 'https://go.perfectpay.com.br/PPU38CPUD1S';
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
-  const [paymentMethod, setPaymentMethod] = useState<'cartao' | 'pix' | 'boleto' | 'picpay'>('pix');
   const [timeLeft, setTimeLeft] = useState(252); // 04:12 inicial conforme imagem
   
   const [formData, setFormData] = useState({
@@ -185,22 +184,6 @@ const CheckoutPage: React.FC = () => {
                 <h2 className="text-xs font-black uppercase tracking-widest">PAGAMENTO</h2>
             </div>
             
-            <div className="grid grid-cols-2 gap-2 mb-6">
-                <button onClick={() => setPaymentMethod('cartao')} className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 text-[10px] font-bold uppercase transition-all ${paymentMethod === 'cartao' ? 'bg-white border-green-500 text-gray-600' : 'bg-[#f4f4f4] border-gray-200 text-gray-500'}`}>
-                    <CreditCard className="w-4 h-4" /> Cartão de Crédito
-                </button>
-                <button onClick={() => setPaymentMethod('boleto')} className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 text-[10px] font-bold uppercase transition-all ${paymentMethod === 'boleto' ? 'bg-white border-green-500 text-gray-600' : 'bg-[#f4f4f4] border-gray-200 text-gray-500'}`}>
-                    <LayoutList className="w-4 h-4" /> Boleto
-                </button>
-                <button onClick={() => setPaymentMethod('pix')} className={`relative flex items-center justify-center gap-2 p-3 rounded-lg border-2 text-[10px] font-bold uppercase transition-all ${paymentMethod === 'pix' ? 'bg-white border-green-500 text-gray-600' : 'bg-[#f4f4f4] border-gray-200 text-gray-500'}`}>
-                    <QrCode className="w-4 h-4" /> Pix
-                    {paymentMethod === 'pix' && <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-0.5"><Check className="w-3 h-3" /></div>}
-                </button>
-                <button onClick={() => setPaymentMethod('picpay')} className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 text-[10px] font-bold uppercase transition-all ${paymentMethod === 'picpay' ? 'bg-white border-green-500 text-gray-600' : 'bg-[#f4f4f4] border-gray-200 text-gray-500'}`}>
-                    PicPay
-                </button>
-            </div>
-
             <div className="bg-[#fcfcfc] border border-gray-100 rounded-lg p-4 mb-6">
                 <div className="text-[11px] text-gray-500 font-medium space-y-4">
                     <p>01. Pagamento em segundos, sem complicações</p>
