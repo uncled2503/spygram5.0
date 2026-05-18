@@ -308,30 +308,6 @@ const CheckoutPage: React.FC = () => {
             <div className="absolute bottom-full right-4 w-0 h-0 border-b-[6px] border-b-[#5a9c51] border-l-[6px] border-l-transparent"></div>
             <ShieldCheck className="w-5 h-5" /> COMPRA 100% SEGURA
         </div>
-
-        <div className="flex flex-col items-center mb-10">
-            <span className="text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">PAGAMENTO PROCESSADO POR:</span>
-            <img src="https://perfectpay.com.br/assets/images/logo-black.png" alt="PerfectPay" className="h-5 opacity-70" />
-        </div>
-
-        <div className="text-center space-y-3 mb-10">
-            <p className="text-[10px] text-gray-400 font-medium">
-                Esta compra será processada por: PerfectPay © 2026 - Todos os direitos reservados.
-            </p>
-            <p className="text-[10px] text-gray-400 font-medium italic">
-                * * Taxa de 2,99% a.m.
-            </p>
-            <p className="text-[10px] text-gray-400 font-medium leading-relaxed px-4">
-                Ao continuar nesta compra, você concorda com os <span className="underline cursor-pointer">Termos de Compra</span> e <span className="underline cursor-pointer">Termos de Privacidade</span>.
-            </p>
-            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-4">
-                Ref: PPA22ZU8 | SN: 6A0B849508A08N
-            </div>
-        </div>
-
-        <div className="flex items-center gap-6 pb-10">
-            <img src="https://static.reclameaqui.com.br/selo/ra1000.png" alt="RA1000" className="h-16" />
-        </div>
       </footer>
     </div>
   );
