@@ -1,31 +1,47 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import BackgroundLayout from '../components/BackgroundLayout';
+import { supabase } from '../integrations/supabase/client';
 import toast from 'react-hot-toast';
 
 const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setIsLoading(true);
 
-    // Lógica de Login de Usuário (Simulada para quem comprou)
-    const hasPurchased = sessionStorage.getItem('hasPurchased') === 'true';
-    
-    // Verificação de acesso para membros (ex: senha padrão ou flag de compra)
-    if (hasPurchased || password === 'membro2024') {
+    try {
+      // Consulta a tabela de membros no Supabase
+      const { data, error } = await supabase
+        .from('members')
+        .select('*')
+        .eq('email', email.trim())
+        .eq('password', password.trim())
+        .single();
+
+      if (error || !data) {
+        toast.error('Acesso negado. Credenciais inválidas ou compra não identificada.');
+        return;
+      }
+
+      // Se encontrou o registro, realiza o login no contexto
       login('user');
-      toast.success('Bem-vindo à Área de Membros');
+      toast.success('Acesso liberado! Bem-vindo(a).');
       navigate('/servers');
-    } else {
-      setError('Acesso negado. Esta área é restrita para membros que realizaram a compra.');
+      
+    } catch (err) {
+      toast.error('Ocorreu um erro ao validar seu acesso.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -33,7 +49,6 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen relative flex flex-col items-center justify-center p-4">
       <div className="bg-[#0f1218]/95 backdrop-blur-2xl border border-gray-800 rounded-[2.5rem] p-10 w-full max-w-[400px] flex flex-col items-center shadow-[0_0_50px_rgba(0,0,0,0.5)] relative z-10">
         
-        {/* Logo SpyGram */}
         <div className="mb-8 flex flex-col items-center">
           <img 
             src="/spygram_transparentebranco.png" 
@@ -42,7 +57,6 @@ const LoginPage: React.FC = () => {
           />
         </div>
 
-        {/* Textos de Acesso */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">ACESSO</h1>
           <p className="text-gray-400 text-xs font-bold uppercase tracking-widest opacity-70">
@@ -53,35 +67,33 @@ const LoginPage: React.FC = () => {
         <form onSubmit={handleLogin} className="w-full flex flex-col gap-5">
           <div className="space-y-4">
             <input
-              type="text"
-              placeholder="USUÁRIO OU E-MAIL"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              placeholder="E-MAIL DE COMPRA"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
               className="w-full bg-[#1c222d]/50 text-white px-6 py-4 rounded-2xl border border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-pink-500/30 placeholder-gray-600 text-xs font-black uppercase tracking-widest transition-all"
             />
             <input
               type="password"
-              placeholder="SENHA"
+              placeholder="CÓDIGO DE ACESSO"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
               className="w-full bg-[#1c222d]/50 text-white px-6 py-4 rounded-2xl border border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-pink-500/30 placeholder-gray-600 text-xs font-black uppercase tracking-widest transition-all"
             />
           </div>
 
-          {error && (
-            <p className="text-red-400 text-[10px] text-center font-black uppercase tracking-tighter animate-pulse">
-              {error}
-            </p>
-          )}
-
           <button
             type="submit"
-            className="w-full py-5 mt-4 rounded-2xl font-black text-sm text-white
+            disabled={isLoading}
+            className={`w-full py-5 mt-4 rounded-2xl font-black text-sm text-white
                        bg-gradient-to-r from-purple-600 to-pink-500
                        shadow-[0_0_25px_rgba(236,72,153,0.3)]
-                       hover:brightness-110 active:scale-95 transition-all uppercase tracking-[0.2em]"
+                       hover:brightness-110 active:scale-95 transition-all uppercase tracking-[0.2em]
+                       ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            ACESSAR SISTEMA
+            {isLoading ? 'VALIDANDO...' : 'ACESSAR SISTEMA'}
           </button>
         </form>
 
