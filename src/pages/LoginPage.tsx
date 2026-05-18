@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import BackgroundLayout from '../components/BackgroundLayout';
 import { supabase } from '../integrations/supabase/client';
@@ -17,10 +18,13 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast.error('Preencha todos os campos');
+      return;
+    }
+    
     setIsLoading(true);
-
     try {
-      // Consulta a tabela de membros no Supabase
       const { data, error } = await supabase
         .from('members')
         .select('*')
@@ -29,17 +33,16 @@ const LoginPage: React.FC = () => {
         .single();
 
       if (error || !data) {
-        toast.error('Acesso negado. Credenciais inválidas ou compra não identificada.');
+        toast.error('Acesso negado. Verifique seus dados.');
         return;
       }
 
-      // Se encontrou o registro, realiza o login no contexto
       login('user');
-      toast.success('Acesso liberado! Bem-vindo(a).');
+      toast.success('Acesso liberado!');
       navigate('/servers');
       
     } catch (err) {
-      toast.error('Ocorreu um erro ao validar seu acesso.');
+      toast.error('Erro ao validar acesso.');
     } finally {
       setIsLoading(false);
     }
@@ -47,63 +50,94 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen relative flex flex-col items-center justify-center p-4">
-      <div className="bg-[#0f1218]/95 backdrop-blur-2xl border border-gray-800 rounded-[2.5rem] p-10 w-full max-w-[400px] flex flex-col items-center shadow-[0_0_50px_rgba(0,0,0,0.5)] relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-[420px] relative"
+      >
+        {/* Efeito de brilho atrás do card */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500 rounded-[2.5rem] blur opacity-20"></div>
         
-        <div className="mb-8 flex flex-col items-center">
-          <img 
-            src="/spygram_transparentebranco.png" 
-            alt="SpyGram Logo" 
-            className="h-16 drop-shadow-[0_0_10px_rgba(225,48,108,0.3)]" 
-          />
-        </div>
-
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">ACESSO</h1>
-          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest opacity-70">
-            Área exclusiva para membros
-          </p>
-        </div>
-
-        <form onSubmit={handleLogin} className="w-full flex flex-col gap-5">
-          <div className="space-y-4">
-            <input
-              type="email"
-              placeholder="E-MAIL DE COMPRA"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              className="w-full bg-[#1c222d]/50 text-white px-6 py-4 rounded-2xl border border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-pink-500/30 placeholder-gray-600 text-xs font-black uppercase tracking-widest transition-all"
-            />
-            <input
-              type="password"
-              placeholder="CÓDIGO DE ACESSO"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              className="w-full bg-[#1c222d]/50 text-white px-6 py-4 rounded-2xl border border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-pink-500/30 placeholder-gray-600 text-xs font-black uppercase tracking-widest transition-all"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-5 mt-4 rounded-2xl font-black text-sm text-white
-                       bg-gradient-to-r from-purple-600 to-pink-500
-                       shadow-[0_0_25px_rgba(236,72,153,0.3)]
-                       hover:brightness-110 active:scale-95 transition-all uppercase tracking-[0.2em]
-                       ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        <div className="relative bg-[#0a0c10]/80 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-10 flex flex-col items-center shadow-2xl">
+          
+          <motion.div 
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            className="mb-10"
           >
-            {isLoading ? 'VALIDANDO...' : 'ACESSAR SISTEMA'}
-          </button>
-        </form>
+            <img 
+              src="/spygram_transparentebranco.png" 
+              alt="SpyGram Logo" 
+              className="h-20 drop-shadow-[0_0_15px_rgba(236,72,153,0.4)]" 
+            />
+          </motion.div>
 
-        <div className="mt-10">
-          <div className="flex items-center justify-center gap-2 text-green-500 font-black text-[10px] uppercase tracking-[0.2em] opacity-80">
-            <ShieldCheck className="w-4 h-4" />
-            <span>SITE SEGURO</span>
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-black text-white tracking-tighter uppercase mb-2">
+              Área de <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-yellow-500">Membros</span>
+            </h1>
+            <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] opacity-80">
+              Autenticação Criptografada
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="w-full space-y-5">
+            <div className="relative group">
+              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-pink-500 transition-colors" />
+              <input
+                type="email"
+                placeholder="E-MAIL DE COMPRA"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="w-full bg-white/5 text-white pl-14 pr-6 py-4 rounded-2xl border border-white/10 focus:outline-none focus:border-pink-500/50 focus:ring-4 focus:ring-pink-500/10 placeholder-gray-600 text-xs font-bold uppercase tracking-widest transition-all"
+              />
+            </div>
+
+            <div className="relative group">
+              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-pink-500 transition-colors" />
+              <input
+                type="password"
+                placeholder="CÓDIGO DE ACESSO"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                className="w-full bg-white/5 text-white pl-14 pr-6 py-4 rounded-2xl border border-white/10 focus:outline-none focus:border-pink-500/50 focus:ring-4 focus:ring-pink-500/10 placeholder-gray-600 text-xs font-bold uppercase tracking-widest transition-all"
+              />
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={isLoading}
+              className={`w-full py-5 mt-4 rounded-2xl font-black text-sm text-white
+                         bg-gradient-to-r from-purple-600 via-pink-500 to-pink-600
+                         shadow-xl shadow-pink-500/20
+                         flex items-center justify-center gap-3
+                         transition-all uppercase tracking-[0.2em]
+                         ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110'}`}
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  Entrar no Painel
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </motion.button>
+          </form>
+
+          <div className="mt-12 flex items-center gap-3 px-6 py-2 rounded-full bg-green-500/5 border border-green-500/10">
+            <ShieldCheck className="w-4 h-4 text-green-500" />
+            <span className="text-green-500/80 font-bold text-[9px] uppercase tracking-[0.2em]">
+              Servidor 100% Protegido
+            </span>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
