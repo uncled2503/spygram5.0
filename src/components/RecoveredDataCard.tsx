@@ -88,14 +88,15 @@ const RecoveredDataCard: React.FC<RecoveredDataCardProps> = ({ onUnlockClick }) 
             </div>
         </div>
 
-        {/* Mini Galeria de Fotos Recuperadas (Aumentada para w-28 h-28) */}
+        {/* Galeria de Fotos Recuperadas (Layout Vertical Centralizado) */}
         {selectedImages.length > 0 && (
-          <div className="flex items-center justify-center gap-10 mb-8 bg-black/60 p-6 rounded-xl border border-red-700/50 max-w-sm mx-auto shadow-lg shadow-red-500/10">
-            <div className="flex -space-x-10"> 
+          <div className="flex flex-col items-center justify-center gap-4 mb-8 bg-black/60 p-8 rounded-xl border border-red-700/50 max-w-sm mx-auto shadow-lg shadow-red-500/10">
+            {/* Miniaturas Sobrepostas */}
+            <div className="flex -space-x-12 ml-8"> {/* ml-8 para compensar visualmente o empilhamento para a direita */}
               {selectedImages.map((src, index) => (
                 <div 
                   key={index} 
-                  className="relative w-28 h-28 rounded-2xl overflow-hidden border-2 border-pink-500 shadow-xl bg-gray-900"
+                  className="relative w-28 h-28 rounded-2xl overflow-hidden border-2 border-pink-500 shadow-2xl bg-gray-900"
                   style={{ zIndex: 3 - index }}
                 >
                   <img 
@@ -110,10 +111,11 @@ const RecoveredDataCard: React.FC<RecoveredDataCardProps> = ({ onUnlockClick }) 
                 </div>
               ))}
             </div>
-            <div className="text-left leading-tight">
-              {/* Agora exibe o total menos 3 */}
+
+            {/* Informações de Contagem abaixo das fotos */}
+            <div className="text-center leading-tight mt-2">
               <span className="text-5xl font-black text-pink-400 animate-pulse">+{photosCount - 3}</span>
-              <p className="text-xs text-gray-300 font-bold uppercase mt-1">Fotos apagadas<br/>encontradas</p>
+              <p className="text-xs text-gray-300 font-bold uppercase mt-1">Fotos apagadas encontradas</p>
             </div>
           </div>
         )}
