@@ -112,7 +112,7 @@ const MainAppContent: React.FC = () => {
 
   if (confirmedProfileData) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4 relative z-10">
         <ProfileConfirmationCard
           profileData={confirmedProfileData}
           onConfirm={handleConfirmInvasion}
@@ -123,7 +123,7 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-black">
       <ProgressBar progress={progressBarProgress} isVisible={isLoading} />
       <div className="relative z-20 text-white flex flex-col items-center px-4 pt-12 pb-8 w-full"> 
         <header className="text-center mb-8 w-full max-w-xl">
@@ -149,7 +149,7 @@ const App: React.FC = () => {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<BackgroundLayout><MainAppContent /></BackgroundLayout>} />
+          <Route path="/" element={<MainAppContent />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
