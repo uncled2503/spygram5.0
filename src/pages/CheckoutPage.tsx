@@ -122,25 +122,20 @@ const CheckoutPage: React.FC = () => {
       {/* --- VERSÃO WEB (DESKTOP) --- */}
       <div className="hidden md:block">
         {/* HERO WEB */}
-        <div className="bg-white pt-12 pb-16 border-b border-gray-100">
-          <div className="max-w-6xl mx-auto px-4 text-center">
+        <div className="bg-white pt-12 pb-16 border-b border-gray-100 relative overflow-hidden">
+          {/* Background Blur */}
+          <div className="absolute inset-0 z-0 opacity-20 grayscale blur-[100px] scale-150 pointer-events-none" 
+               style={{ backgroundImage: 'url(/banner-topo.png)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          
+          <div className="max-w-6xl mx-auto px-4 text-center relative z-10">
             <div className="flex justify-center mb-8">
                <img src="/spygram_transparentebranco.png" alt="SpyGram" className="h-16 brightness-0" />
             </div>
             
-            {/* Collage Placeholder */}
-            <div className="flex justify-center -space-x-4 mb-8">
-                {[1,2,3,4,5,6,7].map(i => (
-                    <div key={i} className="w-14 h-14 rounded-full border-4 border-white bg-gray-200 overflow-hidden shadow-sm">
-                        <img src={`/perfil.jpg`} className="w-full h-full object-cover grayscale opacity-60" />
-                    </div>
-                ))}
+            {/* Banner Principal com Novo Design */}
+            <div className="max-w-3xl mx-auto mb-10">
+                <img src="/banner-topo.png" alt="SpyGram Community" className="w-full h-auto rounded-2xl shadow-2xl" />
             </div>
-
-            <h1 className="text-4xl font-black text-[#111] mb-4">+12,3mil pessoas utilizam e aprovam o SpyGram®.</h1>
-            <p className="text-[#888] text-base max-w-2xl mx-auto leading-relaxed mb-10">
-              Este aplicativo foi testado e aprovado por profissionais, contando com o selo de confiança 'Google Reviews'.
-            </p>
 
             <div className="bg-white shadow-xl rounded-2xl border border-gray-100 p-6 max-w-xl mx-auto flex items-center justify-between gap-8">
                 <div className="flex items-center gap-4">
