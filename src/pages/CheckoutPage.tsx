@@ -113,45 +113,50 @@ const CheckoutPage: React.FC = () => {
       </div>
 
       {/* Hero Section */}
-      <div className="w-full bg-white pt-8 pb-4 px-4 flex flex-col items-center">
-        <div className="w-full max-w-lg flex flex-col items-center">
-            <div className="relative mb-6">
-                <img src="/banner-topo.png" alt="Hero" className="w-full h-auto" />
-            </div>
-            
-            <div className="text-center">
-                <h1 className="text-lg font-black text-[#111] mb-2">+12,3mil pessoas utilizam e aprovam o SpyGram®.</h1>
-                <p className="text-[#666] text-xs font-medium max-w-xs mx-auto leading-tight">
-                    Este aplicativo foi testado e aprovado por profissionais, contando com o selo de confiança 'Google Reviews'.
-                </p>
+      <div className="w-full bg-white pb-8">
+        <div className="w-full max-w-lg mx-auto flex flex-col items-center">
+            {/* Collage and Texts */}
+            <div className="w-full relative px-4 pt-4">
+                <img src="/banner-topo.png" alt="SpyGram Community" className="w-full h-auto" />
+                <div className="text-center mt-4">
+                    <h1 className="text-xl font-black text-[#111] mb-1.5">+12,3mil pessoas utilizam e aprovam o SpyGram®.</h1>
+                    <p className="text-[#888] text-[11px] font-medium max-w-[320px] mx-auto leading-snug">
+                        Este aplicativo foi testado e aprovado por profissionais, contando com o selo de confiança 'Google Reviews'.
+                    </p>
+                </div>
             </div>
 
-            {/* Google Reviews Seal */}
-            <div className="w-full max-w-md mt-6 bg-white border border-gray-100 rounded-xl p-3 flex items-center justify-between shadow-sm">
+            {/* Google Reviews Card */}
+            <div className="w-full max-w-[92%] mt-6 bg-white border border-gray-100 rounded-[1.25rem] p-4 flex items-center justify-between shadow-md">
                 <div className="flex items-center gap-3">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="w-8 h-8" />
                     <div className="text-left">
-                        <p className="text-[11px] font-black text-[#444] uppercase leading-none">GOOGLE REVIEWS:</p>
-                        <p className="text-[11px] font-black text-[#444]">(12,3mil) Avaliações</p>
+                        <p className="text-[10px] font-bold text-[#888] uppercase leading-none tracking-tight">GOOGLE REVIEWS:</p>
+                        <p className="text-[12px] font-black text-[#111] mt-0.5">(12,3mil) Avaliações</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />)}
-                    <span className="text-xs font-bold text-[#444] ml-1">(4,9)</span>
+                    {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />)}
+                    <span className="text-[11px] font-bold text-[#888] ml-1">(4,9)</span>
                 </div>
             </div>
 
             {/* Acquiring Bar */}
-            <div className="w-full max-w-md mt-3 bg-white border border-gray-100 rounded-xl p-3 flex items-center gap-3 text-[#666] text-[10px] font-bold uppercase shadow-sm">
-                <ShoppingCart className="w-5 h-5 text-gray-800" />
-                <span>VOCÊ ESTÁ ADQUIRINDO: Relatório SpyGram Completo</span>
+            <div className="w-full max-w-[92%] mt-4 bg-white border border-gray-100 rounded-[1.25rem] p-4 flex items-center gap-4 shadow-md">
+                <div className="bg-[#f8f8f8] p-2 rounded-lg">
+                    <ShoppingCart className="w-5 h-5 text-gray-800" />
+                </div>
+                <div className="text-left">
+                    <p className="text-[10px] font-bold text-[#888] uppercase leading-none tracking-tight">VOCÊ ESTÁ ADQUIRINDO:</p>
+                    <p className="text-[12px] font-black text-[#111] mt-0.5">Relatório SpyGram Completo</p>
+                </div>
+            </div>
+
+            {/* Dark Promo Banner */}
+            <div className="w-full px-4 mt-6">
+                <img src="/embaixodobanner.png" alt="Promo" className="w-full h-auto rounded-2xl shadow-xl" />
             </div>
         </div>
-      </div>
-
-      {/* Banner Principal Meio */}
-      <div className="px-4 mt-4">
-        <img src="/embaixodobanner.png" alt="Banner Meio" className="w-full rounded-xl shadow-lg" />
       </div>
 
       <div className="max-w-md mx-auto px-4 mt-8 space-y-12">
