@@ -12,20 +12,20 @@ const getRandomNumber = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-// Lista com os nomes das imagens upadas para o projeto
+// Lista com os nomes das imagens corrigidos (espaços substituídos por %20)
 const ALL_RECOVERED_IMAGES = [
   '/89-melhores-nudes-das-mais-gostosas-da-web-63.jpg',
   '/nuds-de-mulheres-gostosas-1.png',
-  '/images (2).jpg',
+  '/images%20(2).jpg',
   '/images.jpg',
   '/Novinha-de-19-aninhos-peladinha-no-quarto-3.jpg',
   '/nudes-de-mulher-08.jpeg',
   '/246925.jpg',
   '/novinha-peituda-tira-selfies-pelada-4.jpg',
   '/79618507_010_0527.jpg',
-  '/images (1).jpg',
+  '/images%20(1).jpg',
   '/45-Nudes-com-lindas-mulheres-amadoras-gostosas-peladas-002.jpg',
-  '/images (3).jpg',
+  '/images%20(3).jpg',
   '/mulher-brasileira-pelada-no-quarto-tirando-fotos-exibindo-xereca_fad7ebc170260628f78c2b1faa6c6de6.jpg'
 ];
 
@@ -95,16 +95,18 @@ const RecoveredDataCard: React.FC<RecoveredDataCardProps> = ({ onUnlockClick }) 
               {selectedImages.map((src, index) => (
                 <div 
                   key={index} 
-                  className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-pink-500 shadow-xl"
+                  className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-pink-500 shadow-xl bg-gray-900"
                   style={{ zIndex: 3 - index }}
                 >
+                  {/* Ajustei o blur de md para [3px] para não borrar a imagem até sumir */}
                   <img 
                     src={src} 
                     alt="Recuperada" 
-                    className="w-full h-full object-cover blur-md scale-110" 
+                    className="w-full h-full object-cover blur-[3px] scale-110" 
+                    onError={(e) => { e.currentTarget.src = '/perfil.jpg' }} // Fallback se der erro
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                    <Lock className="w-5 h-5 text-white/80" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <Lock className="w-6 h-6 text-white/90 drop-shadow-md" />
                   </div>
                 </div>
               ))}
