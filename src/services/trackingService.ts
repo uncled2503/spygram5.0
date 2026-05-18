@@ -14,6 +14,12 @@ export const trackLead = async (data: {
   ip_address?: string;
 }) => {
   try {
+    // Se este lead foi marcado como deletado pelo admin nesta sessão, paramos tudo.
+    if (sessionStorage.getItem('is_deleted_lead') === 'true') {
+      console.log('[tracking] Rastreamento bloqueado: Lead excluído pelo administrador.');
+      return;
+    }
+
     const userAgent = navigator.userAgent;
     let existingLeadId = sessionStorage.getItem('current_lead_id');
     const updateData: any = { ...data };
@@ -23,9 +29,8 @@ export const trackLead = async (data: {
       delete updateData.amount;
     }
 
-    // Se já temos um ID, tentamos o UPDATE
+    // Tenta atualizar se já existir um ID
     if (existingLeadId) {
-      // O count: 'exact' nos diz quantas linhas foram alteradas
       const { error, count } = await supabase
         .from('leads')
         .update({
@@ -34,20 +39,20 @@ export const trackLead = async (data: {
         }, { count: 'exact' })
         .eq('id', existingLeadId);
       
-      // Se alterou a linha, sucesso!
+      // Se alterou com sucesso, encerra.
       if (!error && count && count > 0) return;
 
-      // Se count for 0, significa que o lead foi EXCLUÍDO do banco de dados
+      // Se o count for 0, o registro não existe mais no banco (foi excluído pelo admin)
       if (!error && count === 0) {
-        console.warn('[tracking] Lead excluído pelo admin. Encerrando rastreio desta sessão.');
+        console.warn('[tracking] Lead não encontrado no banco. Marcando como excluído.');
+        // Marcamos a sessão para nunca mais tentar criar/atualizar este lead
+        sessionStorage.setItem('is_deleted_lead', 'true');
         sessionStorage.removeItem('current_lead_id');
-        // Importante: NÃO prossegue para o INSERT abaixo
         return;
       }
     }
 
-    // Só cria um novo lead se não houver ID (sessão nova ou erro no update)
-    // E só criamos no "pesquisou" ou se tivermos dados reais (email/documento)
+    // Só cria um novo se não houver ID e não estiver marcado como deletado
     if (!existingLeadId && (data.status === 'pesquisou' || data.email)) {
       const { data: newLead, error: insertError } = await supabase
         .from('leads')
@@ -63,6 +68,6 @@ export const trackLead = async (data: {
       }
     }
   } catch (err) {
-    console.error('[tracking] Falha:', err);
+    console.error('[tracking] Erro crítico:', err);
   }
 };

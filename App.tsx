@@ -84,12 +84,12 @@ const MainAppContent: React.FC = () => {
         return;
       }
 
+      // RESET TOTAL PARA NOVA PESQUISA
       logout(); 
       sessionStorage.removeItem('invasionEndTime');
       sessionStorage.removeItem('invasionData');
-      
-      // Limpa o ID do lead para que uma nova pesquisa crie um novo registro
       sessionStorage.removeItem('current_lead_id');
+      sessionStorage.removeItem('is_deleted_lead'); // Permite rastrear novamente se for uma busca nova
 
       const [fetchResult] = await Promise.all([
         fetchProfileData(searchQuery.trim()),
