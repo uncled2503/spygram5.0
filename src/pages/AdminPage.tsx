@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
 import { 
   Users, DollarSign, Search, MapPin, ShieldCheck, 
-  CreditCard, Filter, LogOut, RotateCcw, Beaker
+  CreditCard, Filter, LogOut, RotateCcw, Beaker,
+  Trash2, MessageCircle
 } from 'lucide-react';
 import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
@@ -36,26 +37,18 @@ const AdminPage: React.FC = () => {
     if (!silent) setLoading(true);
     
     try {
-      console.log("[Admin] Buscando leads...");
       const { data, error } = await supabase
         .from('leads')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error("[Admin] Erro Supabase:", error);
-        throw error;
-      }
+      if (error) throw error;
+      if (data) setLeads(data);
       
-      if (data) {
-        console.log(`[Admin] ${data.length} leads encontrados.`);
-        setLeads(data);
-      }
-      
-      if (silent) toast.success('Dados sincronizados!');
+      if (silent) toast.success('Dados atualizados!');
     } catch (error: any) {
       console.error('Erro ao buscar leads:', error);
-      toast.error('Erro de Permissão: Verifique o RLS no Supabase. ' + (error.message || ''));
+      toast.error('Erro ao carregar dados: ' + (error.message || ''));
     } finally {
       setLoading(false);
     }
@@ -64,11 +57,9 @@ const AdminPage: React.FC = () => {
   useEffect(() => {
     fetchLeads();
     
-    // Escuta mudanças em tempo real
     const channel = supabase
       .channel('admin-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
-        console.log("[Admin] Mudança detectada em tempo real:", payload);
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
         fetchLeads(true);
       })
       .subscribe();
@@ -82,11 +73,37 @@ const AdminPage: React.FC = () => {
     navigate('/admin-login');
   };
 
+  const handleDeleteLead = async (id: string, username: string) => {
+    if (!window.confirm(`Tem certeza que deseja deletar o lead @${username}?`)) return;
+
+    try {
+      const { error } = await supabase.from('leads').delete().eq('id', id);
+      if (error) throw error;
+      toast.success(`Lead @${username} deletado.`);
+      setLeads(prev => prev.filter(l => l.id !== id));
+    } catch (error: any) {
+      toast.error('Erro ao deletar: ' + error.message);
+    }
+  };
+
+  const handleWhatsAppMessage = (phone: string) => {
+    if (!phone) {
+      toast.error('Número de WhatsApp não disponível.');
+      return;
+    }
+
+    const cleanPhone = phone.replace(/\D/g, '');
+    const message = `Olá! 😊 Tudo bem?\n\nMeu nome é Lukas, sou do suporte SpyGram.\n\nSe você tiver qualquer dúvida sobre, pode me chamar aqui que eu te ajudo rapidinho.\n\nE se quiser garantir seu acesso, também já te explico como fazer`;
+    
+    const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+
   const handleCreateTestLead = async () => {
     const testData = {
       username_searched: 'neymarjr',
       full_name: 'Neymar Jr (Teste)',
-      profile_pic: 'https://images.weserv.nl/?url=https://instagram.fria3-1.fna.fbcdn.net/v/t51.2885-19/44884218_345707102882504_2046091888143237120_n.jpg?_nc_ht=instagram.fria3-1.fna.fbcdn.net&_nc_cat=1&_nc_ohc=1&edm=AAAAAA&ccb=7-5&oh=00_AfC-jL5Lz-f5z5-f5z5-f5z5-f5z5-f5z5-f5z5-f5z5&oe=65C5C5C5&_nc_sid=AAAAAA',
+      profile_pic: 'https://images.weserv.nl/?url=https://instagram.fria3-1.fna.fbcdn.net/v/t51.2885-19/44884218_345707102882504_2046091888143237120_n.jpg?_nc_ht=instagram.fria3-1.fna.fbcdn.net&_nc_cat=1&_nc_ohc=1&edm=AAAAAA&ccb=7-5&oh=00_AfC-jL5Lz-f5z5-f5z5-f5z5-f5z5-f5z5-f5z5&oe=65C5C5C5&_nc_sid=AAAAAA',
       email: 'teste@spygram.com',
       phone: '(11) 99999-9999',
       document: '123.456.789-00',
@@ -98,15 +115,8 @@ const AdminPage: React.FC = () => {
     };
 
     const { error } = await supabase.from('leads').insert([testData]);
-    
-    if (error) {
-      toast.error('Erro ao gerar lead teste: ' + error.message);
-    } else {
-      setSearchTerm('');
-      setStatusFilter('all');
-      toast.success('Lead de teste gerado! Atualizando...');
-      fetchLeads(true);
-    }
+    if (error) toast.error('Erro ao gerar lead teste.');
+    else fetchLeads(true);
   };
 
   const metrics = useMemo(() => {
@@ -128,24 +138,14 @@ const AdminPage: React.FC = () => {
 
   const filteredLeads = useMemo(() => {
     const searchLower = searchTerm.toLowerCase().trim();
-    
     return leads.filter(lead => {
-      const username = (lead.username_searched || '').toLowerCase();
-      const email = (lead.email || '').toLowerCase();
-      const phone = (lead.phone || '');
-      const document = (lead.document || '');
-      const fullName = (lead.full_name || '').toLowerCase();
-
       const matchesSearch = searchLower === '' || 
-        username.includes(searchLower) ||
-        email.includes(searchLower) ||
-        phone.includes(searchLower) ||
-        document.includes(searchLower) ||
-        fullName.includes(searchLower);
-      
-      const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
+        (lead.username_searched || '').toLowerCase().includes(searchLower) ||
+        (lead.email || '').toLowerCase().includes(searchLower) ||
+        (lead.phone || '').includes(searchLower) ||
+        (lead.document || '').includes(searchLower) ||
+        (lead.full_name || '').toLowerCase().includes(searchLower);
+      return matchesSearch && (statusFilter === 'all' || lead.status === statusFilter);
     });
   }, [leads, searchTerm, statusFilter]);
 
@@ -168,7 +168,7 @@ const AdminPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button onClick={handleCreateTestLead} className="flex items-center gap-2 px-4 py-2.5 bg-purple-600/10 border border-purple-600/20 text-purple-400 rounded-xl hover:bg-purple-600/20 transition-all text-xs font-bold uppercase tracking-widest">
             <Beaker className="w-4 h-4" />
-            <span className="hidden sm:inline">Gerar Lead Teste</span>
+            <span className="hidden sm:inline">Lead Teste</span>
           </button>
           <button onClick={() => fetchLeads(true)} className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-widest">
             <RotateCcw className="w-4 h-4" />
@@ -180,119 +180,100 @@ const AdminPage: React.FC = () => {
           </div>
           <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 bg-red-600/10 border border-red-600/20 text-red-500 rounded-xl hover:bg-red-600/20 transition-all text-xs font-bold uppercase tracking-widest">
             <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Sair</span>
           </button>
         </div>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <StatCard title="Total de Leads" value={metrics.total} icon={Users} color="text-blue-500" />
-        <StatCard title="Checkouts" value={metrics.checkoutCount} icon={CreditCard} color="text-yellow-500" subtitle={metrics.total > 0 ? `${((metrics.checkoutCount/metrics.total)*100).toFixed(1)}% do tráfego` : '0%'} />
-        <StatCard title="Pix Gerados" value={metrics.pixCount} icon={CreditCard} color="text-pink-500" subtitle={metrics.checkoutCount > 0 ? `${((metrics.pixCount/metrics.checkoutCount)*100).toFixed(1)}% dos checkouts` : '0%'} />
-        <StatCard title="Vendas Pagas" value={metrics.paidCount} icon={ShieldCheck} color="text-green-500" subtitle={`${metrics.conversion.toFixed(1)}% de conversão final`} />
+        <StatCard title="Visitantes" value={metrics.total} icon={Users} color="text-blue-500" />
+        <StatCard title="Checkouts" value={metrics.checkoutCount} icon={CreditCard} color="text-yellow-500" subtitle={`${((metrics.checkoutCount/metrics.total)*100 || 0).toFixed(1)}% de conv.`} />
+        <StatCard title="Pix Gerados" value={metrics.pixCount} icon={CreditCard} color="text-pink-500" />
+        <StatCard title="Pagos" value={metrics.paidCount} icon={ShieldCheck} color="text-green-500" subtitle={`${metrics.conversion.toFixed(1)}% conv. final`} />
       </div>
 
-      <div className="lg:col-span-3 space-y-6">
-        <div className="bg-gray-900/40 border border-gray-800 rounded-3xl p-6">
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-            <div className="relative w-full md:max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input 
-                type="text" 
-                placeholder="Buscar por @username, Nome, Email..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-black/50 border border-gray-800 rounded-2xl py-3 pl-12 pr-4 text-sm focus:border-purple-500 outline-none transition-all"
-              />
-            </div>
-            
-            <div className="flex gap-2 w-full md:w-auto">
-              <div className="relative flex-1 md:flex-none">
-                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <select 
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full bg-black/50 border border-gray-800 rounded-2xl py-3 pl-12 pr-8 text-xs font-bold uppercase appearance-none outline-none"
-                >
-                  <option value="all">Todos Status</option>
-                  <option value="pesquisou">Pesquisou</option>
-                  <option value="confirmou_alvo">Confirmou Alvo</option>
-                  <option value="checkout">No Checkout</option>
-                  <option value="gerou_pix">Gerou Pix</option>
-                  <option value="pagou">Pago</option>
-                </select>
-              </div>
-            </div>
+      <div className="bg-gray-900/40 border border-gray-800 rounded-3xl p-6">
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
+          <div className="relative w-full md:max-w-md">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <input 
+              type="text" 
+              placeholder="Buscar lead..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-black/50 border border-gray-800 rounded-2xl py-3 pl-12 pr-4 text-sm focus:border-purple-500 outline-none transition-all"
+            />
           </div>
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-black/50 border border-gray-800 rounded-2xl py-3 px-6 text-xs font-bold uppercase outline-none"
+          >
+            <option value="all">Todos Status</option>
+            <option value="pesquisou">Pesquisou</option>
+            <option value="checkout">No Checkout</option>
+            <option value="gerou_pix">Gerou Pix</option>
+            <option value="pagou">Pago</option>
+          </select>
+        </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-[10px] text-gray-500 uppercase font-black border-b border-gray-800/50">
-                  <th className="pb-4 px-4">Alvo / Localização</th>
-                  <th className="pb-4 px-4">Identificação do Lead</th>
-                  <th className="pb-4 px-4">E-mail / WhatsApp</th>
-                  <th className="pb-4 px-4">Status / Valor</th>
-                  <th className="pb-4 px-4">Data/Hora</th>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="text-[10px] text-gray-500 uppercase font-black border-b border-gray-800/50">
+                <th className="pb-4 px-4">Alvo</th>
+                <th className="pb-4 px-4">Lead</th>
+                <th className="pb-4 px-4">E-mail / WhatsApp</th>
+                <th className="pb-4 px-4">Status / Valor</th>
+                <th className="pb-4 px-4 text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800/30">
+              {filteredLeads.map((lead) => (
+                <tr key={lead.id} className="group hover:bg-white/[0.02]">
+                  <td className="py-5 px-4">
+                    <div className="flex items-center gap-3">
+                      <img src={lead.profile_pic || '/perfil.jpg'} className="w-10 h-10 rounded-xl object-cover border border-white/5" />
+                      <div>
+                        <p className="text-sm font-bold text-white">@{lead.username_searched}</p>
+                        <p className="text-[10px] text-gray-500">{lead.city || 'Desconhecido'}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-5 px-4 text-xs font-black text-gray-200 uppercase">{lead.full_name || 'Anônimo'}</td>
+                  <td className="py-5 px-4">
+                    <p className="text-[11px] font-medium text-blue-300 lowercase">{lead.email || '---'}</p>
+                    <p className="text-[11px] font-bold text-green-400">{lead.phone || '---'}</p>
+                  </td>
+                  <td className="py-5 px-4">
+                    <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase ${
+                      lead.status === 'pagou' ? 'bg-green-500/10 text-green-500' :
+                      lead.status === 'gerou_pix' ? 'bg-pink-500/10 text-pink-500' : 'bg-gray-800/50 text-gray-400'
+                    }`}>
+                      {lead.status}
+                    </span>
+                  </td>
+                  <td className="py-5 px-4">
+                    <div className="flex items-center justify-center gap-2">
+                      <button 
+                        onClick={() => handleWhatsAppMessage(lead.phone)}
+                        className="p-2 bg-green-500/10 text-green-500 rounded-lg hover:bg-green-500/20 transition-all"
+                        title="Enviar mensagem WhatsApp"
+                      >
+                        <MessageCircle size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteLead(lead.id, lead.username_searched)}
+                        className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-all"
+                        title="Deletar Lead"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800/30">
-                {filteredLeads.length > 0 ? filteredLeads.map((lead) => (
-                  <tr key={lead.id} className="group hover:bg-white/[0.02] transition-colors">
-                    <td className="py-5 px-4">
-                      <div className="flex items-center gap-3">
-                        <img src={lead.profile_pic || '/perfil.jpg'} className="w-10 h-10 rounded-xl object-cover border border-white/5" />
-                        <div>
-                          <p className="text-sm font-bold text-white">@{lead.username_searched}</p>
-                          <div className="flex items-center gap-1 text-[10px] text-gray-500">
-                            <MapPin size={10} className="text-purple-500" />
-                            <span>{lead.city || 'Desconhecida'}, {lead.state || '??'}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-5 px-4">
-                      <div className="space-y-1">
-                        <p className="text-xs font-black text-gray-200 uppercase">{lead.full_name || 'Visitante Anônimo'}</p>
-                        <p className="text-[10px] font-bold text-purple-400 font-mono tracking-tighter">DOC: {lead.document || '---'}</p>
-                      </div>
-                    </td>
-                    <td className="py-5 px-4">
-                      <div className="space-y-1">
-                        <p className="text-[11px] font-medium text-blue-300 lowercase">{lead.email || '---'}</p>
-                        <p className="text-[11px] font-bold text-green-400">{lead.phone || '---'}</p>
-                      </div>
-                    </td>
-                    <td className="py-5 px-4">
-                      <div className="flex flex-col gap-1.5">
-                        <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg w-fit uppercase ${
-                          lead.status === 'pagou' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
-                          lead.status === 'gerou_pix' ? 'bg-pink-500/10 text-pink-500 border border-pink-500/20' :
-                          lead.status === 'checkout' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
-                          'bg-gray-800/50 text-gray-400'
-                        }`}>
-                          {lead.status}
-                        </span>
-                        {lead.total_amount > 0 && (
-                          <p className="text-xs font-black text-white">R$ {Number(lead.total_amount).toFixed(2)}</p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-5 px-4">
-                      <p className="text-[10px] text-gray-500">{new Date(lead.created_at).toLocaleDateString('pt-BR')}</p>
-                      <p className="text-[10px] font-bold text-gray-400">{new Date(lead.created_at).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
-                    </td>
-                  </tr>
-                )) : (
-                  <tr>
-                    <td colSpan={5} className="py-20 text-center text-gray-600 font-bold uppercase tracking-widest text-xs">
-                      Nenhum lead encontrado. Tente atualizar ou verifique o RLS no Supabase.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -300,19 +281,14 @@ const AdminPage: React.FC = () => {
 };
 
 const StatCard = ({ title, value, icon: Icon, color, subtitle }: any) => (
-  <div className="bg-gray-900/40 border border-gray-800 p-6 rounded-3xl relative overflow-hidden group hover:border-white/10 transition-all">
-    <div className={`absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity`}>
-      <Icon size={80} />
-    </div>
+  <div className="bg-gray-900/40 border border-gray-800 p-6 rounded-3xl relative group">
     <div className="relative z-10">
       <div className="flex items-center gap-3 mb-4">
-        <div className={`p-2 rounded-xl bg-white/5 ${color}`}>
-          <Icon size={18} />
-        </div>
+        <div className={`p-2 rounded-xl bg-white/5 ${color}`}><Icon size={18} /></div>
         <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{title}</span>
       </div>
       <p className="text-3xl font-black text-white mb-1">{value}</p>
-      {subtitle && <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">{subtitle}</p>}
+      {subtitle && <p className="text-[10px] text-gray-500 font-bold uppercase">{subtitle}</p>}
     </div>
   </div>
 );
