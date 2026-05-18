@@ -1,7 +1,8 @@
 import React from 'react';
-import { ShieldCheck, Coins, Zap, Infinity, Star } from 'lucide-react';
+import { ShieldCheck, Coins, Zap, Infinity, Star, ChevronRight, Check } from 'lucide-react';
 import SparkleButton from '../components/ui/SparkleButton'; 
-import toast from 'react-hot-toast'; // Importa o toast
+import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 interface CreditPackage {
   id: number;
@@ -12,6 +13,7 @@ interface CreditPackage {
   checkoutUrl: string;
   icon: React.ElementType;
   highlight?: boolean;
+  features: string[];
 }
 
 const CreditsPage: React.FC = () => {
@@ -19,30 +21,33 @@ const CreditsPage: React.FC = () => {
     {
       id: 1,
       amount: 10,
-      title: "10 Créditos",
+      title: "Pacote Lite",
       price: "R$ 49,50",
-      description: "Créditos imediatos após confirmação.",
+      description: "Ideal para invasões pontuais e rápidas.",
       checkoutUrl: "https://checkout.perfectpay.com.br/pay/PPU38COTFU1",
       icon: Zap,
+      features: ['10 Créditos de Invasão', 'Acesso 24h', 'Suporte Padrão']
     },
     {
       id: 2,
       amount: 30,
-      title: "30 Créditos",
+      title: "Pacote Premium",
       price: "R$ 79,50",
-      description: "Melhor custo-benefício mensal.",
+      description: "O favorito dos investigadores profissionais.",
       checkoutUrl: "https://checkout.perfectpay.com.br/pay/PPU38COTFU6",
       icon: Star,
       highlight: true,
+      features: ['30 Créditos de Invasão', 'Recuperador de Mensagens', 'Localização em Tempo Real', 'Suporte VIP']
     },
     {
       id: 3,
       amount: "Ilimitados",
-      title: "Créditos Ilimitados",
+      title: "Acesso Vitalício",
       price: "R$ 149,00",
-      description: "Uso sem limites permanentemente.",
+      description: "Controle total e permanente sem limites.",
       checkoutUrl: "https://checkout.perfectpay.com.br/pay/PPU38COTFU8",
       icon: Infinity,
+      features: ['Créditos Ilimitados', 'Todas as Ferramentas Pro', 'Acesso Vitalício', 'Suporte Prioritário 24/7']
     },
   ];
 
@@ -55,65 +60,121 @@ const CreditsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans p-4 sm:p-8 flex flex-col">
-      {/* Header */}
-      <header className="flex justify-between items-center mb-12">
-        <div className="flex items-center gap-2">
-          <img src="/spygram_transparentebranco.png" alt="SpyGram Logo" className="h-8" />
-          <span className="text-xl font-bold">SpyGram</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-400 text-sm">Créditos: 0</span>
-          <span className="text-gray-400 text-sm">@user-403</span>
-        </div>
-      </header>
+    <div className="min-h-screen bg-transparent text-gray-200 font-sans selection:bg-purple-500/30 overflow-x-hidden">
+      {/* Ambient background glows + Blur layer over Matrix rain */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[4px]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-900/10 blur-[120px] rounded-full"></div>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center max-w-6xl mx-auto text-center">
-        <Coins className="w-20 h-20 text-purple-400 mb-6" />
-        <h1 className="text-4xl font-extrabold text-white mb-4">Comprar Créditos</h1>
-        <p className="text-gray-400 text-lg mb-12 max-w-2xl">
-          Escolha o pacote de créditos que melhor se adapta às suas necessidades e comece a invadir perfis agora mesmo!
-        </p>
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
+        {/* Header */}
+        <header className="flex justify-between items-center mb-16">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md">
+              <img src="/spygram_transparentebranco.png" alt="SpyGram" className="h-6" />
+            </div>
+            <span className="text-xl font-black text-white uppercase tracking-tighter">SpyGram</span>
+          </div>
+          
+          <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-4 py-2 rounded-2xl backdrop-blur-md">
+             <div className="flex flex-col items-end">
+               <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Créditos</span>
+               <span className="text-sm font-black text-purple-400">0</span>
+             </div>
+             <div className="w-px h-6 bg-white/10"></div>
+             <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 p-[1px]">
+                  <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                    <img src="/perfil.jpg" alt="User" className="w-full h-full object-cover opacity-50" />
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-white">@user-403</span>
+             </div>
+          </div>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center gap-3 bg-purple-500/10 border border-purple-500/20 px-4 py-2 rounded-full mb-6"
+          >
+            <Coins className="w-5 h-5 text-purple-400" />
+            <span className="text-xs font-black text-purple-400 uppercase tracking-[0.3em]">Recarga de Sistema</span>
+          </motion.div>
+          <h1 className="text-6xl font-black text-white mb-6 tracking-tighter uppercase leading-none">
+            ADQUIRIR <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">CRÉDITOS.</span>
+          </h1>
+          <p className="text-gray-500 text-base font-medium max-w-2xl mx-auto leading-relaxed">
+            Escolha a potência do seu acesso. Cada crédito libera uma invasão completa com extração total de dados e monitoramento em tempo real.
+          </p>
+        </div>
+
+        {/* Credit Packages Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-16">
           {creditPackages.map((pkg) => (
-            <div
+            <motion.div
               key={pkg.id}
+              whileHover={{ scale: 1.02, translateY: -10 }}
               onClick={() => handleCardClick(pkg.checkoutUrl)}
-              className={`relative bg-gray-900/70 backdrop-blur-sm border rounded-2xl shadow-lg p-6 flex flex-col items-center transition-all duration-300 cursor-pointer active:scale-[0.98]
-                ${pkg.highlight ? 'border-purple-500 shadow-purple-500/30 scale-105' : 'border-gray-700 shadow-purple-500/10'}`}
+              className={`relative group bg-white/5 backdrop-blur-xl border rounded-[2.5rem] p-8 flex flex-col items-center transition-all duration-300 cursor-pointer shadow-2xl
+                ${pkg.highlight ? 'border-purple-500 bg-white/10' : 'border-white/10 hover:border-purple-500/50'}`}
             >
               {pkg.highlight && (
-                <span className="absolute -top-3 px-3 py-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-bold rounded-full shadow-md">
-                  MAIS POPULAR
-                </span>
+                <div className="absolute -top-4 px-4 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-xl">
+                  Altamente Recomendado
+                </div>
               )}
-              <pkg.icon className="w-12 h-12 text-purple-400 mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">{pkg.title}</h2>
-              <p className="text-4xl font-extrabold bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-transparent bg-clip-text mb-4">
-                {pkg.price}
-              </p>
-              <p className="text-gray-300 text-sm mb-6 flex-1">{pkg.description}</p>
-            </div>
+              
+              <div className={`p-4 rounded-2xl mb-6 ${pkg.highlight ? 'bg-purple-500/20' : 'bg-white/5'}`}>
+                <pkg.icon className={`w-8 h-8 ${pkg.highlight ? 'text-purple-400' : 'text-gray-400'}`} />
+              </div>
+
+              <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">{pkg.title}</h2>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-3xl font-black text-white">{pkg.price}</span>
+              </div>
+              
+              <p className="text-gray-500 text-xs text-center mb-8 font-medium leading-relaxed">{pkg.description}</p>
+
+              <div className="w-full space-y-3 mb-8">
+                {pkg.features.map((feature, fIdx) => (
+                  <div key={fIdx} className="flex items-center gap-3">
+                    <Check className={`w-4 h-4 ${pkg.highlight ? 'text-purple-400' : 'text-gray-600'}`} />
+                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className={`w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-xs uppercase tracking-widest transition-all
+                ${pkg.highlight ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' : 'bg-white/5 text-gray-300 group-hover:bg-purple-600 group-hover:text-white'}`}>
+                Selecionar Plano
+                <ChevronRight className="w-4 h-4" />
+              </div>
+            </motion.div>
           ))}
         </div>
 
-        <div className="mt-12 w-full max-w-xs"> {/* Adicionado um contêiner para o botão */}
-          <SparkleButton onClick={handleInvadeClick}>
-            Realizar invasão
-          </SparkleButton>
-        </div>
-      </main>
+        {/* CTA Footer */}
+        <div className="flex flex-col items-center gap-8">
+          <div className="w-full max-w-xs">
+            <SparkleButton onClick={handleInvadeClick}>
+              Realizar Nova Invasão
+            </SparkleButton>
+          </div>
 
-      {/* Footer */}
-      <footer className="text-center mt-auto py-8">
-        <div className="inline-flex items-center gap-2 bg-red-600/20 border border-red-500 text-red-300 px-4 py-2 rounded-full text-sm mb-2">
-          <ShieldCheck className="w-4 h-4 text-red-400" />
-          <span>Cadeado Site Seguro - SSL Verificado</span>
+          <div className="flex flex-col items-center">
+            <div className="inline-flex items-center gap-3 bg-red-600/10 border border-red-600/20 text-red-500 px-6 py-3 rounded-full mb-4 backdrop-blur-md">
+              <ShieldCheck className="w-5 h-5" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Gateway de Pagamento 100% Criptografado</span>
+            </div>
+            <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.5em]">SpyGram © 2024 Intelligence Systems</p>
+          </div>
         </div>
-        <p className="text-gray-500 text-xs">Todos os direitos reservados a SpyGram</p>
-      </footer>
+      </div>
     </div>
   );
 };
