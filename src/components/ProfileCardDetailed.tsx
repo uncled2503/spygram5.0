@@ -1,83 +1,84 @@
 import React from 'react';
 import { ProfileData } from '../../types';
-import { Zap } from 'lucide-react';
+import { Zap, BadgeCheck, Shield } from 'lucide-react';
 
 interface ProfileCardDetailedProps {
   profileData: ProfileData;
 }
 
-// Função para formatar o número, agora retornando o valor exato (sem K ou M)
 const formatNumber = (num: number) => {
   return new Intl.NumberFormat('pt-BR').format(num);
 };
 
 const ProfileCardDetailed: React.FC<ProfileCardDetailedProps> = ({ profileData }) => {
-  
-  // Usar a biografia real, ou um placeholder se não houver
   const bioLines = profileData.biography ? profileData.biography.split('\n').filter(line => line.trim() !== '') : [];
-  
-  // A primeira linha da bio é usada para o ícone Zap
-  const bioLine1 = bioLines[0] || ''; // Se não houver bio, a primeira linha é vazia
+  const bioLine1 = bioLines[0] || '';
   const remainingBio = bioLines.slice(1).join('\n');
 
-  // Verifica se há alguma linha de biografia para renderizar a seção
-  const hasBioContent = bioLine1 || remainingBio;
-
   return (
-    <div className="bg-gray-900/80 border border-gray-700 rounded-2xl shadow-2xl shadow-purple-500/10 p-6 w-full mx-auto">
-      {/* Header: Pic, Username, Fullname */}
-      <div className="flex items-center gap-4 mb-6">
-        <img
-          src={profileData.profilePicUrl}
-          alt={profileData.username}
-          className="w-20 h-20 rounded-full object-cover border-2 border-pink-500"
-        />
-        <div className="flex-1 text-left">
-          <p className="text-2xl font-bold text-white">@{profileData.username}</p>
-          <p className="text-gray-400">{profileData.fullName} 😟</p>
+    <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 shadow-2xl overflow-hidden group">
+      {/* Detalhe de Brilho no Topo */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50" />
+      
+      <div className="flex flex-col items-center text-center">
+        {/* Avatar com Anel de Gradiente */}
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-pink-500 rounded-full blur-md opacity-50 group-hover:opacity-100 transition-opacity" />
+          <img
+            src={profileData.profilePicUrl}
+            alt={profileData.username}
+            className="relative w-28 h-28 rounded-full object-cover border-4 border-black"
+          />
         </div>
+
+        {/* Nomes */}
+        <div className="mb-6">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <h2 className="text-2xl font-black text-white tracking-tight">@{profileData.username}</h2>
+            {profileData.isVerified && <BadgeCheck className="w-6 h-6 text-blue-400 fill-blue-400/10" />}
+          </div>
+          <p className="text-gray-400 font-medium">{profileData.fullName}</p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 w-full gap-4 mb-8">
+          <div className="bg-white/5 rounded-2xl py-3 border border-white/5">
+            <p className="text-lg font-black text-white">{formatNumber(profileData.postsCount)}</p>
+            <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Posts</p>
+          </div>
+          <div className="bg-white/5 rounded-2xl py-3 border border-white/5">
+            <p className="text-lg font-black text-white">{formatNumber(profileData.followers)}</p>
+            <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Seguidores</p>
+          </div>
+          <div className="bg-white/5 rounded-2xl py-3 border border-white/5">
+            <p className="text-lg font-black text-white">{formatNumber(profileData.following)}</p>
+            <p className="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Seguindo</p>
+          </div>
+        </div>
+
+        {/* Bio */}
+        {(bioLine1 || remainingBio) && (
+          <div className="w-full text-left bg-black/40 rounded-2xl p-4 border border-white/5">
+            {bioLine1 && (
+              <div className="flex items-start gap-2 mb-2">
+                <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-gray-200 font-medium leading-tight">{bioLine1}</span>
+              </div>
+            )}
+            {remainingBio && (
+              <p className="text-xs text-gray-400 whitespace-pre-wrap leading-relaxed">{remainingBio}</p>
+            )}
+          </div>
+        )}
+
+        {/* Status Privado */}
+        {profileData.isPrivate && (
+          <div className="mt-6 flex items-center gap-2 text-red-400 text-xs font-black uppercase tracking-widest bg-red-500/10 px-4 py-2 rounded-full border border-red-500/20">
+            <Shield className="w-3.5 h-3.5" />
+            Criptografia de Conta Privada Quebrada
+          </div>
+        )}
       </div>
-
-      {/* Stats: Posts, Followers, Following */}
-      <div className="flex justify-around text-center text-sm border-t border-b border-gray-800 py-4 mb-4">
-        <div>
-          <p className="font-bold text-xl text-white">{formatNumber(profileData.postsCount)}</p>
-          <p className="text-gray-400 text-xs">Posts</p>
-        </div>
-        <div>
-          <p className="font-bold text-xl text-white">{formatNumber(profileData.followers)}</p>
-          <p className="text-gray-400 text-xs">Followers</p>
-        </div>
-        <div>
-          <p className="font-bold text-xl text-white">{formatNumber(profileData.following)}</p>
-          <p className="text-gray-400 text-xs">Following</p>
-        </div>
-      </div>
-
-      {/* Biography */}
-      {hasBioContent && (
-        <div className="text-sm text-gray-300 text-left space-y-1">
-          {/* Primeira linha da Bio com Zap Icon */}
-          {bioLine1 && (
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <span>{bioLine1}</span>
-            </div>
-          )}
-          
-          {/* Restante da Biografia */}
-          {remainingBio && (
-            <p className="whitespace-pre-wrap pt-2">{remainingBio}</p>
-          )}
-        </div>
-      )}
-
-      {/* Private Status Banner */}
-      {profileData.isPrivate && (
-        <div className="mt-6 bg-yellow-800/50 border border-yellow-600 text-yellow-300 px-4 py-3 rounded-lg text-center text-sm font-semibold">
-          Este perfil é privado. O SpyGram conseguiu invadir mesmo assim!
-        </div>
-      )}
     </div>
   );
 };
