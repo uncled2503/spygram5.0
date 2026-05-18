@@ -1,8 +1,9 @@
 import React from 'react';
-import { ShieldCheck, Coins, Zap, Infinity, Star, ChevronRight, Check } from 'lucide-react';
+import { Coins, Zap, Infinity, Star, ChevronRight, Check } from 'lucide-react';
 import SparkleButton from '../components/ui/SparkleButton'; 
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import AppHeader from '../components/AppHeader';
 
 interface CreditPackage {
   id: number;
@@ -61,7 +62,6 @@ const CreditsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-transparent text-gray-200 font-sans selection:bg-purple-500/30 overflow-x-hidden">
-      {/* Ambient background glows + Blur layer over Matrix rain */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[4px]"></div>
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[120px] rounded-full"></div>
@@ -69,33 +69,8 @@ const CreditsPage: React.FC = () => {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
-        {/* Header */}
-        <header className="flex justify-between items-center mb-16">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md">
-              <img src="/spygram_transparentebranco.png" alt="SpyGram" className="h-6" />
-            </div>
-            <span className="text-xl font-black text-white uppercase tracking-tighter">SpyGram</span>
-          </div>
-          
-          <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-4 py-2 rounded-2xl backdrop-blur-md">
-             <div className="flex flex-col items-end">
-               <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Créditos</span>
-               <span className="text-sm font-black text-purple-400">0</span>
-             </div>
-             <div className="w-px h-6 bg-white/10"></div>
-             <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 p-[1px]">
-                  <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
-                    <img src="/perfil.jpg" alt="User" className="w-full h-full object-cover opacity-50" />
-                  </div>
-                </div>
-                <span className="text-xs font-bold text-white">@user-403</span>
-             </div>
-          </div>
-        </header>
+        <AppHeader />
 
-        {/* Hero Section */}
         <div className="text-center mb-16">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
@@ -113,7 +88,6 @@ const CreditsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Credit Packages Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-16">
           {creditPackages.map((pkg) => (
             <motion.div
@@ -158,21 +132,13 @@ const CreditsPage: React.FC = () => {
           ))}
         </div>
 
-        {/* CTA Footer */}
         <div className="flex flex-col items-center gap-8">
           <div className="w-full max-w-xs">
             <SparkleButton onClick={handleInvadeClick}>
               Realizar Nova Invasão
             </SparkleButton>
           </div>
-
-          <div className="flex flex-col items-center">
-            <div className="inline-flex items-center gap-3 bg-red-600/10 border border-red-600/20 text-red-500 px-6 py-3 rounded-full mb-4 backdrop-blur-md">
-              <ShieldCheck className="w-5 h-5" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Gateway de Pagamento 100% Criptografado</span>
-            </div>
-            <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.5em]">SpyGram © 2024 Intelligence Systems</p>
-          </div>
+          <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.5em]">SpyGram © 2024 Intelligence Systems</p>
         </div>
       </div>
     </div>

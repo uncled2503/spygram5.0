@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Server, Globe, Users as UsersIcon, Zap, Activity } from 'lucide-react';
+import { Server, Globe, Users as UsersIcon, Zap, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import AppHeader from '../components/AppHeader';
 
 interface ServerCardProps {
   serverNumber: number;
@@ -10,7 +11,6 @@ interface ServerCardProps {
 }
 
 const ServerCard: React.FC<ServerCardProps> = ({ serverNumber, ping, onClick }) => {
-  // Cor baseada no ping: Verde para baixo, Amarelo médio, Vermelho alto
   const getPingColor = (p: number) => {
     if (p < 30) return 'text-green-400';
     if (p < 60) return 'text-yellow-400';
@@ -30,7 +30,6 @@ const ServerCard: React.FC<ServerCardProps> = ({ serverNumber, ping, onClick }) 
       onClick={onClick}
       className="relative group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 w-full flex flex-col items-start transition-all duration-300 hover:border-purple-500/50 hover:bg-white/10 overflow-hidden shadow-2xl"
     >
-      {/* Glow effect on hover */}
       <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-0 group-hover:opacity-10 transition duration-500"></div>
       
       <div className="flex justify-between items-start w-full mb-6">
@@ -86,7 +85,6 @@ const ServersPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-transparent text-gray-300 font-sans selection:bg-purple-500/30 overflow-x-hidden">
-      {/* Ambient background glows + Blur layer over Matrix rain */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[4px]"></div>
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[120px] rounded-full"></div>
@@ -94,33 +92,8 @@ const ServersPage: React.FC = () => {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
-        {/* Header */}
-        <header className="flex justify-between items-center mb-16">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md">
-              <img src="/spygram_transparentebranco.png" alt="SpyGram" className="h-6" />
-            </div>
-            <span className="text-xl font-black text-white uppercase tracking-tighter">SpyGram</span>
-          </div>
-          
-          <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-4 py-2 rounded-2xl backdrop-blur-md">
-             <div className="flex flex-col items-end">
-               <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Créditos</span>
-               <span className="text-sm font-black text-purple-400">0</span>
-             </div>
-             <div className="w-px h-6 bg-white/10"></div>
-             <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 p-[1px]">
-                  <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
-                    <img src="/perfil.jpg" alt="User" className="w-full h-full object-cover opacity-50" />
-                  </div>
-                </div>
-                <span className="text-xs font-bold text-white">@user-403</span>
-             </div>
-          </div>
-        </header>
+        <AppHeader />
 
-        {/* Hero Section */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
           <div className="max-w-2xl">
             <motion.div 
@@ -158,7 +131,6 @@ const ServersPage: React.FC = () => {
           <h2 className="text-sm font-black text-white uppercase tracking-widest">Selecione um ponto de entrada seguro</h2>
         </div>
 
-        {/* Servers Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-20">
           {servers.map((server) => (
             <ServerCard 
@@ -170,12 +142,7 @@ const ServersPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Footer */}
         <footer className="pt-12 border-t border-white/5 flex flex-col items-center">
-          <div className="inline-flex items-center gap-3 bg-green-500/10 border border-green-500/20 px-6 py-3 rounded-full mb-6 backdrop-blur-md">
-            <ShieldCheck className="w-5 h-5 text-green-500" />
-            <span className="text-xs font-black text-green-500 uppercase tracking-widest">Conexão 100% Criptografada (SSL)</span>
-          </div>
           <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.5em]">© 2024 SpyGram Intelligence Division</p>
         </footer>
       </div>
