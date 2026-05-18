@@ -76,12 +76,12 @@ const InvasionConcludedPage: React.FC = () => {
   if (!profileData) return null;
 
   return (
-    <div className="min-h-screen bg-black text-gray-200 font-sans selection:bg-purple-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-gray-200 font-sans selection:bg-purple-500/30 overflow-x-hidden">
       
-      {/* Background Decorativo */}
+      {/* Background Decorativo Sutil (Sobreposto ao Matrix) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/20 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-900/20 blur-[120px] rounded-full" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-900/10 blur-[120px] rounded-full" />
       </div>
 
       <main className="relative z-10 w-full max-w-[480px] mx-auto px-4 pt-12 pb-24">
@@ -90,7 +90,7 @@ const InvasionConcludedPage: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-2 mb-8 bg-green-500/10 border border-green-500/30 py-2 px-4 rounded-full w-fit mx-auto"
+          className="flex items-center justify-center gap-2 mb-8 bg-green-500/10 border border-green-500/30 py-2 px-4 rounded-full w-fit mx-auto backdrop-blur-md"
         >
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           <span className="text-green-400 text-xs font-black uppercase tracking-widest">Invasão 100% Concluída</span>
@@ -109,7 +109,7 @@ const InvasionConcludedPage: React.FC = () => {
         </motion.div>
 
         {/* Bloco Conexo: Card de Perfil + Círculo Íntimo */}
-        <section className="mb-12 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden group">
+        <section className="mb-12 bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden group">
           <ProfileCardDetailed profileData={profileData} />
           
           <div className="px-8 pb-8">

@@ -98,7 +98,7 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-transparent">
       <ProgressBar progress={progressBarProgress} isVisible={isLoading} />
       <div className="relative z-20 text-white flex flex-col items-center px-4 pt-12 pb-8 w-full"> 
         <header className="text-center mb-8 w-full max-w-xl">
@@ -127,8 +127,8 @@ const App: React.FC = () => {
           <Route path="/" element={<BackgroundLayout><MainAppContent /></BackgroundLayout>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/invasion-simulation" element={<InvasionSimulationPage />} />
-          <Route path="/invasion-concluded" element={<InvasionConcludedPage />} />
+          <Route path="/invasion-simulation" element={<BackgroundLayout><InvasionSimulationPage /></BackgroundLayout>} />
+          <Route path="/invasion-concluded" element={<BackgroundLayout><InvasionConcludedPage /></BackgroundLayout>} />
           
           <Route path="/servers" element={<ProtectedRoute><BackgroundLayout><ServersPage /></BackgroundLayout></ProtectedRoute>} />
           <Route path="/credits" element={<ProtectedRoute><BackgroundLayout><CreditsPage /></BackgroundLayout></ProtectedRoute>} />
