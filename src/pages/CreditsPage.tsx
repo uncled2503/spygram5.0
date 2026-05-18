@@ -1,5 +1,5 @@
 import React from 'react';
-import { Coins, Zap, Infinity, Star, ChevronRight, Check } from 'lucide-react';
+import { Coins, Zap, Infinity, Star, ChevronRight, Check, ShieldCheck } from 'lucide-react';
 import SparkleButton from '../components/ui/SparkleButton'; 
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
@@ -68,77 +68,84 @@ const CreditsPage: React.FC = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-900/10 blur-[120px] rounded-full"></div>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <AppHeader />
 
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="inline-flex items-center gap-3 bg-purple-500/10 border border-purple-500/20 px-4 py-2 rounded-full mb-6"
           >
-            <Coins className="w-5 h-5 text-purple-400" />
-            <span className="text-xs font-black text-purple-400 uppercase tracking-[0.3em]">Recarga de Sistema</span>
+            <Coins className="w-4 sm:w-5 h-4 sm:h-5 text-purple-400" />
+            <span className="text-[10px] sm:text-xs font-black text-purple-400 uppercase tracking-[0.3em]">Recarga de Sistema</span>
           </motion.div>
-          <h1 className="text-6xl font-black text-white mb-6 tracking-tighter uppercase leading-none">
+          <h1 className="text-4xl sm:text-6xl font-black text-white mb-6 tracking-tighter uppercase leading-tight">
             ADQUIRIR <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">CRÉDITOS.</span>
           </h1>
-          <p className="text-gray-500 text-base font-medium max-w-2xl mx-auto leading-relaxed">
-            Escolha a potência do seu acesso. Cada crédito libera uma invasão completa com extração total de dados e monitoramento em tempo real.
+          <p className="text-gray-500 text-sm sm:text-base font-medium max-w-2xl mx-auto leading-relaxed px-4">
+            Escolha a potência do seu acesso. Cada crédito libera uma invasão completa com extração total de dados.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 w-full mb-16">
           {creditPackages.map((pkg) => (
             <motion.div
               key={pkg.id}
-              whileHover={{ scale: 1.02, translateY: -10 }}
+              whileHover={{ scale: 1.02, translateY: -5 }}
               onClick={() => handleCardClick(pkg.checkoutUrl)}
-              className={`relative group bg-white/5 backdrop-blur-xl border rounded-[2.5rem] p-8 flex flex-col items-center transition-all duration-300 cursor-pointer shadow-2xl
+              className={`relative group bg-white/5 backdrop-blur-xl border rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 flex flex-col items-center transition-all duration-300 cursor-pointer shadow-2xl
                 ${pkg.highlight ? 'border-purple-500 bg-white/10' : 'border-white/10 hover:border-purple-500/50'}`}
             >
               {pkg.highlight && (
-                <div className="absolute -top-4 px-4 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-xl">
-                  Altamente Recomendado
+                <div className="absolute -top-4 px-4 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full shadow-xl">
+                  Mais Popular
                 </div>
               )}
               
-              <div className={`p-4 rounded-2xl mb-6 ${pkg.highlight ? 'bg-purple-500/20' : 'bg-white/5'}`}>
-                <pkg.icon className={`w-8 h-8 ${pkg.highlight ? 'text-purple-400' : 'text-gray-400'}`} />
+              <div className={`p-4 rounded-xl sm:rounded-2xl mb-6 ${pkg.highlight ? 'bg-purple-500/20' : 'bg-white/5'}`}>
+                <pkg.icon className={`w-6 sm:w-8 h-6 sm:h-8 ${pkg.highlight ? 'text-purple-400' : 'text-gray-400'}`} />
               </div>
 
-              <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">{pkg.title}</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-white mb-2 uppercase tracking-tighter">{pkg.title}</h2>
               <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-3xl font-black text-white">{pkg.price}</span>
+                <span className="text-2xl sm:text-3xl font-black text-white">{pkg.price}</span>
               </div>
               
-              <p className="text-gray-500 text-xs text-center mb-8 font-medium leading-relaxed">{pkg.description}</p>
+              <p className="text-gray-500 text-[10px] sm:text-xs text-center mb-8 font-medium leading-relaxed">{pkg.description}</p>
 
               <div className="w-full space-y-3 mb-8">
                 {pkg.features.map((feature, fIdx) => (
                   <div key={fIdx} className="flex items-center gap-3">
-                    <Check className={`w-4 h-4 ${pkg.highlight ? 'text-purple-400' : 'text-gray-600'}`} />
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{feature}</span>
+                    <Check className={`w-3.5 sm:w-4 h-3.5 sm:h-4 ${pkg.highlight ? 'text-purple-400' : 'text-gray-600'}`} />
+                    <span className="text-[9px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left leading-tight">{feature}</span>
                   </div>
                 ))}
               </div>
 
-              <div className={`w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-xs uppercase tracking-widest transition-all
+              <div className={`w-full py-4 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all
                 ${pkg.highlight ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' : 'bg-white/5 text-gray-300 group-hover:bg-purple-600 group-hover:text-white'}`}>
                 Selecionar Plano
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3 sm:w-4 h-3 sm:h-4" />
               </div>
             </motion.div>
           ))}
         </div>
 
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-8 px-4">
           <div className="w-full max-w-xs">
             <SparkleButton onClick={handleInvadeClick}>
               Realizar Nova Invasão
             </SparkleButton>
           </div>
-          <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.5em]">SpyGram © 2024 Intelligence Systems</p>
+
+          <div className="flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 sm:gap-3 bg-red-600/10 border border-red-600/20 text-red-500 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full mb-4 backdrop-blur-md">
+              <ShieldCheck className="w-4 sm:w-5 h-4 sm:h-5" />
+              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest">Gateway de Pagamento Seguro</span>
+            </div>
+            <p className="text-gray-600 text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.5em]">SpyGram © 2024 Intelligence</p>
+          </div>
         </div>
       </div>
     </div>

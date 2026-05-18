@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Server, Globe, Users as UsersIcon, Zap, Activity } from 'lucide-react';
+import { Server, Globe, Users as UsersIcon, Zap, Activity, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import AppHeader from '../components/AppHeader';
@@ -42,7 +42,7 @@ const ServerCard: React.FC<ServerCardProps> = ({ serverNumber, ping, onClick }) 
         </div>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 text-left">
         <h3 className="text-white font-black text-sm uppercase tracking-tighter">Servidor #{serverNumber}</h3>
         <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Localização: LATAM-BR</p>
       </div>
@@ -91,47 +91,47 @@ const ServersPage: React.FC = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-900/10 blur-[120px] rounded-full"></div>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <AppHeader />
 
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
-          <div className="max-w-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-12 mb-16">
+          <div className="max-w-2xl text-center lg:text-left">
             <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3 mb-4"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-center lg:justify-start gap-3 mb-4"
             >
               <Activity className="w-5 h-5 text-pink-500" />
               <span className="text-xs font-black text-pink-500 uppercase tracking-[0.3em]">Status da Rede</span>
             </motion.div>
-            <h1 className="text-6xl font-black text-white mb-6 tracking-tighter leading-none">
+            <h1 className="text-4xl sm:text-6xl font-black text-white mb-6 tracking-tighter leading-tight">
               NÓS <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SERVERS.</span>
             </h1>
-            <p className="text-gray-500 text-sm font-medium leading-relaxed max-w-lg">
-              Arquitetura de rede distribuída globalmente. Selecione o ponto de entrada com a menor latência para garantir uma infiltração 100% estável e anônima.
+            <p className="text-gray-500 text-sm font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
+              Arquitetura de rede distribuída globalmente. Selecione o ponto de entrada com a menor latência para garantir uma infiltração estável.
             </p>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="flex flex-col items-center p-6 bg-white/5 border border-white/10 rounded-[2rem] min-w-[140px] backdrop-blur-xl">
-               <UsersIcon className="w-6 h-6 text-purple-400 mb-2" />
-               <span className="text-2xl font-black text-white tabular-nums">{onlineUsers}</span>
-               <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest mt-1">Operadores</span>
+          <div className="grid grid-cols-2 gap-4 sm:gap-6">
+            <div className="flex flex-col items-center p-4 sm:p-6 bg-white/5 border border-white/10 rounded-[1.5rem] sm:rounded-[2rem] backdrop-blur-xl">
+               <UsersIcon className="w-5 h-5 text-purple-400 mb-2" />
+               <span className="text-xl sm:text-2xl font-black text-white tabular-nums">{onlineUsers}</span>
+               <span className="text-[8px] sm:text-[9px] font-black text-gray-500 uppercase tracking-widest mt-1">Operadores</span>
             </div>
-            <div className="flex flex-col items-center p-6 bg-white/5 border border-white/10 rounded-[2rem] min-w-[140px] backdrop-blur-xl">
-               <Zap className="w-6 h-6 text-yellow-400 mb-2" />
-               <span className="text-2xl font-black text-white tabular-nums">99.9%</span>
-               <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest mt-1">Uptime</span>
+            <div className="flex flex-col items-center p-4 sm:p-6 bg-white/5 border border-white/10 rounded-[1.5rem] sm:rounded-[2rem] backdrop-blur-xl">
+               <Zap className="w-5 h-5 text-yellow-400 mb-2" />
+               <span className="text-xl sm:text-2xl font-black text-white tabular-nums">99.9%</span>
+               <span className="text-[8px] sm:text-[9px] font-black text-gray-500 uppercase tracking-widest mt-1">Uptime</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center justify-center lg:justify-start gap-3 mb-8">
           <Globe className="w-4 h-4 text-purple-500" />
-          <h2 className="text-sm font-black text-white uppercase tracking-widest">Selecione um ponto de entrada seguro</h2>
+          <h2 className="text-[10px] sm:text-sm font-black text-white uppercase tracking-widest">Ponto de entrada seguro</h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-16 sm:mb-20">
           {servers.map((server) => (
             <ServerCard 
               key={server.id} 
@@ -143,7 +143,11 @@ const ServersPage: React.FC = () => {
         </div>
 
         <footer className="pt-12 border-t border-white/5 flex flex-col items-center">
-          <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.5em]">© 2024 SpyGram Intelligence Division</p>
+          <div className="inline-flex items-center gap-3 bg-green-500/10 border border-green-500/20 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full mb-6 backdrop-blur-md">
+            <ShieldCheck className="w-4 sm:w-5 h-4 sm:h-5 text-green-500" />
+            <span className="text-[9px] sm:text-xs font-black text-green-500 uppercase tracking-widest">Conexão Criptografada</span>
+          </div>
+          <p className="text-gray-600 text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.5em]">© 2024 SpyGram Intelligence</p>
         </footer>
       </div>
     </div>
