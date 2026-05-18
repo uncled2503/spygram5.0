@@ -42,10 +42,10 @@ const CheckoutPage: React.FC = () => {
   const basePrice = 29.90;
   
   const bumpDetails = {
-    pro: { price: 9.90 },
-    social: { price: 19.90 },
-    recover: { price: 15.90 },
-    track: { price: 15.90 }
+    pro: { title: 'SpyGram Vitalício', price: 9.90, img: '/order-bumps/vitalicio.jpg' },
+    social: { title: 'Acesso a todas as Redes', price: 19.90, img: '/order-bumps/social.jpg' },
+    recover: { title: 'Recuperar Dados Apagados', price: 15.90, img: '/order-bumps/recover.jpg' },
+    track: { title: 'Rastreamento 24h', price: 15.90, img: '/order-bumps/track.jpg' }
   };
 
   const calculateAdicionais = () => {
@@ -139,14 +139,26 @@ const CheckoutPage: React.FC = () => {
               </div>
             </section>
 
-            {/* Order Bumps */}
+            {/* Order Bumps com Ícones de Imagem */}
             <section className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 uppercase mb-4 text-center">Melhore seu plano</h2>
-              <div className="space-y-3">
-                {Object.keys(bumps).map((key) => (
-                  <div key={key} onClick={() => handleToggleBump(key as keyof typeof bumps)} className={`p-4 rounded-lg border cursor-pointer flex justify-between items-center transition-all ${bumps[key as keyof typeof bumps] ? 'bg-purple-50 border-purple-400' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
-                    <span className="text-xs font-bold uppercase text-gray-800">{key === 'pro' ? 'SpyGram Vitalício' : key === 'social' ? 'Espião WhatsApp/Face' : key === 'recover' ? 'Recuperar Apagadas' : 'Rastreamento 24h'}</span>
-                    <span className="text-green-600 font-bold text-sm">+ R$ {bumpDetails[key as keyof typeof bumps].price.toFixed(2)}</span>
+              <div className="space-y-4">
+                {(Object.keys(bumps) as Array<keyof typeof bumps>).map((key) => (
+                  <div 
+                    key={key} 
+                    onClick={() => handleToggleBump(key)} 
+                    className={`p-4 rounded-xl border-2 cursor-pointer flex items-center gap-4 transition-all ${bumps[key] ? 'bg-purple-50 border-purple-500 ring-2 ring-purple-100' : 'bg-white border-gray-100 hover:border-gray-300'}`}
+                  >
+                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
+                        <img src={bumpDetails[key].img} alt={bumpDetails[key].title} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1">
+                        <span className="block text-xs font-black uppercase text-gray-900 tracking-tight">{bumpDetails[key].title}</span>
+                        <span className="block text-green-600 font-black text-sm mt-0.5">R$ {bumpDetails[key].price.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${bumps[key] ? 'bg-purple-600 border-purple-600' : 'border-gray-300'}`}>
+                        {bumps[key] && <Check className="w-4 h-4 text-white" />}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -160,8 +172,8 @@ const CheckoutPage: React.FC = () => {
               
               <h2 className="text-lg font-black text-gray-900 uppercase mb-6 border-b border-gray-200 pb-4">Resumo</h2>
               <div className="space-y-3 text-sm mb-6 text-gray-600">
-                <div className="flex justify-between"><span>Plano Completo</span><span>R$ {basePrice.toFixed(2)}</span></div>
-                {adicionais > 0 && <div className="flex justify-between text-purple-600 font-medium"><span>Adicionais</span><span>+ R$ {adicionais.toFixed(2)}</span></div>}
+                <div className="flex justify-between"><span>Plano Completo</span><span>R$ {basePrice.toFixed(2).replace('.', ',')}</span></div>
+                {adicionais > 0 && <div className="flex justify-between text-purple-600 font-bold italic"><span>Adicionais</span><span>+ R$ {adicionais.toFixed(2).replace('.', ',')}</span></div>}
               </div>
               <div className="border-t border-gray-200 pt-4 mb-6 flex justify-between items-end">
                 <span className="text-lg font-bold text-gray-900">Total:</span>
