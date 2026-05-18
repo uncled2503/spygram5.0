@@ -15,14 +15,19 @@ const AdminLoginPage: React.FC = () => {
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username || !password) {
+      toast.error('Preencha todos os campos.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Consulta a tabela de admins no Supabase
+      // Consulta a tabela de admins ignorando case no username
       const { data, error } = await supabase
         .from('admins')
         .select('*')
-        .eq('username', username.trim())
+        .ilike('username', username.trim()) // ilike ignora maiúsculas/minúsculas
         .eq('password', password.trim())
         .single();
 
