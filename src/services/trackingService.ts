@@ -15,21 +15,17 @@ export const trackLead = async (data: {
 }) => {
   try {
     const userAgent = navigator.userAgent;
-    
-    // Tenta recuperar ID do lead da sessão para atualizar o mesmo registro
-    let existingLeadId = sessionStorage.getItem('current_lead_id');
-
+    const existingLeadId = sessionStorage.getItem('current_lead_id');
     const updateData: any = { ...data };
     
-    // Mapeia 'amount' para 'total_amount' se presente
     if (data.amount !== undefined) {
       updateData.total_amount = data.amount;
       delete updateData.amount;
     }
 
-    // Se já temos um ID, fazemos o UPDATE
+    // Se já temos um ID, tentamos o UPDATE
     if (existingLeadId) {
-      console.log(`[tracking] Atualizando lead: ${existingLeadId}`, updateData);
+      console.log(`[tracking] Tentando atualizar lead: ${existingLeadId}`);
       const { error } = await supabase
         .from('leads')
         .update({
@@ -38,33 +34,25 @@ export const trackLead = async (data: {
         })
         .eq('id', existingLeadId);
       
-      if (error) {
-        console.error('[tracking] Erro no update:', error.message);
-        // Se falhar o update (ex: lead deletado), limpamos o ID para criar um novo abaixo
-        existingLeadId = null;
-      } else {
-        return; // Sucesso
-      }
+      // Se o erro for de permissão (42501) ou coluna inexistente, tentamos um novo INSERT
+      if (!error) return;
+      console.warn('[tracking] Falha no update, tentando novo insert:', error.message);
     }
 
-    // Se não houver ID ou o update falhou, fazemos o INSERT
-    if (!existingLeadId) {
-      console.log('[tracking] Criando novo lead', updateData);
-      const { data: newLead, error: insertError } = await supabase
-        .from('leads')
-        .insert([{
-          ...updateData,
-          user_agent: userAgent
-        }])
-        .select()
-        .single();
+    // Criar novo lead se não houver ID ou se o update falhou
+    const { data: newLead, error: insertError } = await supabase
+      .from('leads')
+      .insert([{
+        ...updateData,
+        user_agent: userAgent
+      }])
+      .select()
+      .single();
 
-      if (insertError) {
-        console.error('[tracking] Erro no insert:', insertError.message);
-      } else if (newLead) {
-        sessionStorage.setItem('current_lead_id', newLead.id);
-        console.log('[tracking] Novo ID salvo:', newLead.id);
-      }
+    if (insertError) {
+      console.error('[tracking] Erro fatal no insert:', insertError.message);
+    } else if (newLead) {
+      sessionStorage.setItem('current_lead_id', newLead.id);
     }
   } catch (err) {
     console.error('[tracking] Falha crítica:', err);

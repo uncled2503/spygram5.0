@@ -70,11 +70,11 @@ const MainAppContent: React.FC = () => {
     try {
       const location = await getUserLocation();
 
-      // VERIFICAÇÃO DE IP ÚNICO
-      const { data: existingLead, error: checkError } = await supabase
+      // Verificação segura de IP (não trava se a coluna não existir)
+      const { data: existingLead } = await supabase
         .from('leads')
         .select('id')
-        .eq('ip_address', location.ip)
+        .eq('ip_address' as any, location.ip)
         .limit(1)
         .maybeSingle();
 
@@ -87,6 +87,7 @@ const MainAppContent: React.FC = () => {
       logout(); 
       sessionStorage.removeItem('invasionEndTime');
       sessionStorage.removeItem('invasionData');
+      sessionStorage.removeItem('current_lead_id'); // Garante um novo lead limpo
 
       const [fetchResult] = await Promise.all([
         fetchProfileData(searchQuery.trim()),
@@ -97,7 +98,7 @@ const MainAppContent: React.FC = () => {
       setConfirmedSuggestions(fetchResult.suggestions);
       setConfirmedPosts(fetchResult.posts);
 
-      trackLead({
+      await trackLead({
         username_searched: fetchResult.profile.username,
         full_name: fetchResult.profile.fullName,
         profile_pic: fetchResult.profile.profilePicUrl,
@@ -143,7 +144,7 @@ const MainAppContent: React.FC = () => {
     <div className="min-h-screen bg-black">
       <ProgressBar progress={progressBarProgress} isVisible={isLoading} />
       <div className="relative z-20 text-white flex flex-col items-center px-4 pt-12 pb-8 w-full"> 
-        <header className="text-center mb-8 w-full max-w-xl">
+        <header className="text-center mb-8 w-full max-xl">
           <img src="/spygram_transparentebranco.png" alt="Logo" className="h-24 mx-auto mb-6" />
           <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-transparent bg-clip-text uppercase">SpyGram</h1>
           <p className="text-xl font-bold">ACESSE O <span className="text-pink-500">INSTAGRAM</span> DE QUALQUER PESSOA <span className="text-yellow-500">SEM SENHA</span></p>
