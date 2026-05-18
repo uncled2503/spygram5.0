@@ -164,16 +164,6 @@ const InvasionConcludedPage: React.FC = () => {
           </div>
 
           <PriceDiscountCard originalPrice="R$ 97,90" discountedPrice="R$ 29,90" onUnlockClick={handleUnlockClick} />
-
-          <div className="pt-8">
-            <ShineButton
-              onClick={handleUnlockClick}
-              className="w-full bg-green-600 h-16 rounded-2xl active:scale-95 transition-transform"
-              shineColorClasses="bg-white/30"
-            >
-              <span className="text-xl font-black uppercase tracking-tighter">LIBERAR ACESSO VITALÍCIO</span>
-            </ShineButton>
-          </div>
         </section>
 
         <SectionDivider />
