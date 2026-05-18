@@ -17,13 +17,12 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
   amount,
   onConfirm
 }) => {
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutos
+  const TOTAL_TIME = 600; // 10 minutos em segundos
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [copied, setCopied] = useState(false);
 
-  // Limpa a string base64 de espaços em branco ou quebras de linha que podem quebrar a imagem
+  // Limpa a string base64 de espaços em branco ou quebras de linha
   const cleanBase64 = paymentCodeBase64?.replace(/\s/g, '') || '';
-  
-  // Verifica se já possui o prefixo data:image, se não, adiciona o padrão PNG
   const qrCodeSrc = cleanBase64.startsWith('data:image') 
     ? cleanBase64 
     : `data:image/png;base64,${cleanBase64}`;
@@ -47,6 +46,9 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
     toast.success("Código Copiado!");
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // Cálculo da porcentagem da barra (diminuindo junto com o tempo)
+  const progressPercentage = (timeLeft / TOTAL_TIME) * 100;
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden border border-gray-100 text-gray-800 animate-fade-in">
@@ -112,7 +114,7 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
           Confirmar Compra <ChevronRight size={18} />
         </button>
 
-        {/* Cronômetro */}
+        {/* Cronômetro e Barra de Progresso */}
         <div className="mt-8 bg-[#fff5f5] border border-[#ffeded] rounded-lg p-4">
           <div className="flex items-center gap-3 text-[#f15c5c] text-xs font-bold mb-3">
             <Clock size={16} />
@@ -121,8 +123,8 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
           
           <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-[#f15c5c] transition-all duration-1000" 
-              style={{ width: `${(timeLeft / 600) * 100}%` }}
+              className="h-full bg-[#f15c5c] transition-all duration-1000 ease-linear" 
+              style={{ width: `${progressPercentage}%` }}
             />
           </div>
           
