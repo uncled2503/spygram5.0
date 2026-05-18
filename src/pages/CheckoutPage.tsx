@@ -280,14 +280,8 @@ const CheckoutPage: React.FC = () => {
             <div className="max-w-6xl mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                     <p className="text-[11px] font-bold text-gray-400 uppercase">E-MAIL DE SUPORTE: contato@spygram.com.br</p>
-                    <div className="flex items-center gap-8">
-                        <div className="flex flex-col items-center text-[10px] text-gray-400 font-bold uppercase">
-                            PAGAMENTO PROCESSADO POR:
-                            <img src="https://logodownload.org/wp-content/uploads/2021/04/perfect-pay-logo.png" className="h-6 mt-1 grayscale opacity-60" />
-                        </div>
-                        <div className="bg-[#78cc6d] text-white px-4 py-2 rounded-md flex items-center gap-2 text-[10px] font-black uppercase">
-                            <ShieldCheck size={14} /> COMPRA 100% SEGURA
-                        </div>
+                    <div className="bg-[#78cc6d] text-white px-4 py-2 rounded-md flex items-center gap-2 text-[10px] font-black uppercase">
+                        <ShieldCheck size={14} /> COMPRA 100% SEGURA
                     </div>
                 </div>
             </div>
