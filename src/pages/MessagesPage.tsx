@@ -60,12 +60,14 @@ const MessagesPage: React.FC = () => {
       }));
       setStories(suggestedStories);
 
+      // Lista de prévias incluindo mensagens de curiosidade
       const messagePreviews = [
-        'Mencionou você em um story',
+        'Vem aqui logo, tô sozinha... 😈',
+        'Não conta pra ninguém o que a gente fez',
+        'Precisamos conversar sobre ontem 😬',
         'Enviou um anexo',
         'Visto',
         'Respondeu ao seu story',
-        '4 novas mensagens',
         'Enviou uma mensagem de áudio',
         'Foto temporária',
         'Curtiu uma mensagem'
