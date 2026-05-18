@@ -12,21 +12,21 @@ const getRandomNumber = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-// Lista com os nomes das imagens corrigidos (espaços substituídos por %20)
+// Lista com os novos caminhos das imagens sem espaços
 const ALL_RECOVERED_IMAGES = [
-  '/89-melhores-nudes-das-mais-gostosas-da-web-63.jpg',
-  '/nuds-de-mulheres-gostosas-1.png',
-  '/images%20(2).jpg',
-  '/images.jpg',
-  '/Novinha-de-19-aninhos-peladinha-no-quarto-3.jpg',
-  '/nudes-de-mulher-08.jpeg',
-  '/246925.jpg',
-  '/novinha-peituda-tira-selfies-pelada-4.jpg',
-  '/79618507_010_0527.jpg',
-  '/images%20(1).jpg',
-  '/45-Nudes-com-lindas-mulheres-amadoras-gostosas-peladas-002.jpg',
-  '/images%20(3).jpg',
-  '/mulher-brasileira-pelada-no-quarto-tirando-fotos-exibindo-xereca_fad7ebc170260628f78c2b1faa6c6de6.jpg'
+  '/recovered/img_1.jpg',
+  '/recovered/img_2.png',
+  '/recovered/img_3.jpg',
+  '/recovered/img_4.jpg',
+  '/recovered/img_5.jpg',
+  '/recovered/img_6.jpeg',
+  '/recovered/img_7.jpg',
+  '/recovered/img_8.jpg',
+  '/recovered/img_9.jpg',
+  '/recovered/img_10.jpg',
+  '/recovered/img_11.jpg',
+  '/recovered/img_12.jpg',
+  '/recovered/img_13.jpg'
 ];
 
 const RecoveredDataCard: React.FC<RecoveredDataCardProps> = ({ onUnlockClick }) => {
@@ -98,14 +98,13 @@ const RecoveredDataCard: React.FC<RecoveredDataCardProps> = ({ onUnlockClick }) 
                   className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-pink-500 shadow-xl bg-gray-900"
                   style={{ zIndex: 3 - index }}
                 >
-                  {/* Ajustei o blur de md para [3px] para não borrar a imagem até sumir */}
                   <img 
                     src={src} 
                     alt="Recuperada" 
-                    className="w-full h-full object-cover blur-[3px] scale-110" 
-                    onError={(e) => { e.currentTarget.src = '/perfil.jpg' }} // Fallback se der erro
+                    className="w-full h-full object-cover blur-[5px] scale-110" 
+                    onError={(e) => { e.currentTarget.src = '/perfil.jpg' }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                     <Lock className="w-6 h-6 text-white/90 drop-shadow-md" />
                   </div>
                 </div>
