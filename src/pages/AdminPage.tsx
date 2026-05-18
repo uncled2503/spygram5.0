@@ -72,11 +72,15 @@ const AdminPage: React.FC = () => {
     navigate('/admin-login');
   };
 
+  const handleRefresh = () => {
+    fetchLeads(true);
+  };
+
   const handleCreateTestLead = async () => {
     const testData = {
       username_searched: 'neymarjr',
       full_name: 'Neymar Jr (Teste)',
-      profile_pic: 'https://images.weserv.nl/?url=https://instagram.fria3-1.fna.fbcdn.net/v/t51.2885-19/44884218_345707102882504_2046091888143237120_n.jpg?_nc_ht=instagram.fria3-1.fna.fbcdn.net&_nc_cat=1&_nc_ohc=1&edm=AAAAAA&ccb=7-5&oh=00_AfC-jL5Lz-f5z5-f5z5-f5z5-f5z5-f5z5-f5z5-f5z5&oe=65C5C5C5&_nc_sid=AAAAAA',
+      profile_pic: 'https://images.weserv.nl/?url=https://instagram.fria3-1.fna.fbcdn.net/v/t51.2885-19/44884218_345707102882504_2046091888143237120_n.jpg?_nc_ht=instagram.fria3-1.fna.fbcdn.net&_nc_cat=1&_nc_ohc=1&edm=AAAAAA&ccb=7-5&oh=00_AfC-jL5Lz-f5z5-f5z5-f5z5-f5z5-f5z5-f5z5&oe=65C5C5C5&_nc_sid=AAAAAA',
       email: 'teste@spygram.com',
       phone: '(11) 99999-9999',
       document: '123.456.789-00',
@@ -120,7 +124,6 @@ const AdminPage: React.FC = () => {
     const searchLower = searchTerm.toLowerCase().trim();
     
     return leads.filter(lead => {
-      // Filtragem segura para evitar erros com campos nulos
       const username = (lead.username_searched || '').toLowerCase();
       const email = (lead.email || '').toLowerCase();
       const phone = (lead.phone || '');
