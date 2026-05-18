@@ -222,10 +222,14 @@ const CheckoutPage: React.FC = () => {
 
             <div className="space-y-4">
                 {(Object.keys(bumps) as Array<keyof typeof bumps>).map((key) => (
-                    <div key={key} className="bg-white border border-gray-100 rounded-2xl p-4 flex gap-4 shadow-sm">
+                    <div 
+                      key={key} 
+                      onClick={() => handleToggleBump(key)}
+                      className="bg-white border border-gray-100 rounded-2xl p-4 flex gap-4 shadow-sm cursor-pointer select-none active:scale-[0.98] transition-transform"
+                    >
                         {/* Left: Image */}
                         <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
-                            <img src={bumpDetails[key].img} alt="" className="w-full h-full object-contain" />
+                            <img src={bumpDetails[key].img} alt="" className="w-full h-full object-contain pointer-events-none" />
                         </div>
                         
                         {/* Right: Content */}
@@ -234,8 +238,8 @@ const CheckoutPage: React.FC = () => {
                                 <input 
                                     type="checkbox" 
                                     checked={bumps[key]} 
-                                    onChange={() => handleToggleBump(key)} 
-                                    className="w-6 h-6 rounded border-gray-300 text-green-600 cursor-pointer self-start" 
+                                    readOnly
+                                    className="w-6 h-6 rounded border-gray-300 text-green-600 cursor-pointer self-start pointer-events-none" 
                                 />
                                 <p className="text-[10px] font-black text-gray-700 uppercase leading-tight">
                                     {bumpDetails[key].titlePart1}{' '}
