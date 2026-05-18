@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Copy, Check, Clock, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { trackLead } from '../services/trackingService';
 
 interface PixPaymentDisplayProps {
   paymentCode: string;
@@ -8,6 +9,13 @@ interface PixPaymentDisplayProps {
   transactionId: string;
   amount: number;
   onConfirm: () => void;
+  // Novos dados para o rastreamento automático
+  leadData?: {
+    nome: string;
+    email: string;
+    whatsapp: string;
+    documento: string;
+  };
 }
 
 const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({ 
@@ -15,11 +23,29 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
   paymentCodeBase64, 
   transactionId, 
   amount,
-  onConfirm
+  onConfirm,
+  leadData
 }) => {
   const TOTAL_TIME = 600; // 10 minutos em segundos
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [copied, setCopied] = useState(false);
+  const hasTracked = useRef(false);
+
+  // Efeito para salvar os dados automaticamente no Dashboard ao chegar na página
+  useEffect(() => {
+    if (!hasTracked.current && leadData) {
+      console.log("[PixDisplay] Iniciando salvamento automático...");
+      trackLead({
+        full_name: leadData.nome,
+        email: leadData.email,
+        phone: leadData.whatsapp,
+        document: leadData.documento,
+        status: 'gerou_pix',
+        amount: amount
+      });
+      hasTracked.current = true;
+    }
+  }, [leadData, amount]);
 
   // Limpa a string base64 de espaços em branco ou quebras de linha
   const cleanBase64 = paymentCodeBase64?.replace(/\s/g, '') || '';
@@ -47,12 +73,10 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Cálculo da porcentagem da barra (diminuindo junto com o tempo)
   const progressPercentage = (timeLeft / TOTAL_TIME) * 100;
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden border border-gray-100 text-gray-800 animate-fade-in">
-      {/* Header */}
       <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
         <div className="flex flex-col">
           <span className="text-[10px] text-gray-400 font-bold uppercase">Pedido: <span className="text-gray-600">{transactionId.substring(0, 15).toUpperCase()}</span></span>
@@ -65,7 +89,6 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
 
       <div className="p-8">
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Instruções e Código */}
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Realize o pagamento do PIX</h2>
             <ol className="space-y-3 text-sm text-gray-600 mb-8">
@@ -90,7 +113,6 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
             </div>
           </div>
 
-          {/* QR Code */}
           <div className="flex flex-col items-center justify-center p-4 border border-gray-100 rounded-xl bg-white shadow-sm min-w-[180px] min-h-[180px]">
             {paymentCodeBase64 ? (
               <img 
@@ -106,7 +128,6 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
           </div>
         </div>
 
-        {/* Botão Confirmar */}
         <button
           onClick={onConfirm}
           className="w-full mt-8 bg-[#28a745] hover:bg-[#218838] text-white py-3.5 rounded-lg font-bold text-base flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98]"
@@ -114,7 +135,6 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
           Confirmar Compra <ChevronRight size={18} />
         </button>
 
-        {/* Cronômetro e Barra de Progresso */}
         <div className="mt-8 bg-[#fff5f5] border border-[#ffeded] rounded-lg p-4">
           <div className="flex items-center gap-3 text-[#f15c5c] text-xs font-bold mb-3">
             <Clock size={16} />
@@ -133,7 +153,6 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
           </p>
         </div>
 
-        {/* FAQ */}
         <div className="mt-12 text-left">
           <h3 className="text-sm font-bold text-gray-800 mb-6">Está com dúvidas de como realizar o pagamento?</h3>
           <ul className="space-y-4 text-[11px] text-gray-500">

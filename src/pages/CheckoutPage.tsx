@@ -86,6 +86,7 @@ const CheckoutPage: React.FC = () => {
 
     const currentLeadId = sessionStorage.getItem('current_lead_id');
 
+    // Salvamento preliminar
     await trackLead({
       email: formData.email,
       phone: formData.whatsapp,
@@ -114,7 +115,8 @@ const CheckoutPage: React.FC = () => {
               paymentCode: data.paymentCode,
               paymentCodeBase64: data.paymentCodeBase64,
               idTransaction: data.idTransaction,
-              amount: total
+              amount: total,
+              leadInfo: { ...formData } // Passa os dados para o componente de exibição
             });
             toast.success("PIX Gerado!", { id: toastId });
         } else {
@@ -149,6 +151,7 @@ const CheckoutPage: React.FC = () => {
           paymentCodeBase64={pixData.paymentCodeBase64}
           transactionId={pixData.idTransaction}
           amount={pixData.amount}
+          leadData={pixData.leadInfo}
           onConfirm={() => toast.success("Aguardando confirmação...")}
         />
       </div>
@@ -163,12 +166,9 @@ const CheckoutPage: React.FC = () => {
       </div>
 
       <div className="max-w-xl mx-auto px-4 py-6">
-        {/* Banner de Topo */}
         <img src="/banner-topo.png" alt="Banner Topo" className="w-full h-auto mb-6 rounded-lg shadow-sm" />
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 space-y-8">
-          
-          {/* Dados Pessoais */}
           <div>
             <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
               <Check className="w-4 h-4 text-green-500" /> 1. DADOS PESSOAIS
@@ -182,7 +182,6 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Pagamento */}
           <div>
             <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
               <Check className="w-4 h-4 text-green-500" /> 2. PAGAMENTO
@@ -193,7 +192,6 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Order Bumps */}
           <div className="space-y-4">
             <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">OFERTAS EXCLUSIVAS</h2>
             
@@ -237,7 +235,6 @@ const CheckoutPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Banner de Segurança */}
           <div className="flex flex-col items-center gap-4 pt-4">
              <img src="/embaixodobanner.png" alt="Segurança" className="w-full h-auto opacity-80" />
              <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase">
