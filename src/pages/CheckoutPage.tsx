@@ -131,34 +131,37 @@ const CheckoutPage: React.FC = () => {
                 email: formData.email,
                 document: formData.documento,
                 phone: formData.whatsapp,
-                amount: total,
-                items: [
-                    { name: 'Relatório SpyGram Completo', price: basePrice },
-                    ...Object.keys(bumps)
-                        .filter(k => bumps[k as keyof typeof bumps])
-                        .map(k => ({ name: bumpDetails[k as keyof typeof bumps].title, price: bumpDetails[k as keyof typeof bumps].price }))
-                ]
+                amount: total
             },
         });
 
         if (error) throw error;
 
-        sessionStorage.setItem('hasPurchased', 'true');
-
-        if (data.checkout_url) {
-            window.location.href = data.checkout_url;
-        } else if (data.pix_url) {
-            window.location.href = data.pix_url;
-        } else if (data.url) {
-            window.location.href = data.url;
+        // Se a API retornou o código Pix Copia e Cola
+        if (data.paymentCode) {
+            // Copia para o clipboard automaticamente para facilitar para o usuário
+            try {
+                await navigator.clipboard.writeText(data.paymentCode);
+                toast.success("Código Pix Copiado!", { id: toastId });
+            } catch (err) {
+                toast.success("Pix gerado com sucesso!", { id: toastId });
+            }
+            
+            // Como não podemos alterar o layout, usamos um alert para mostrar o código se necessário 
+            // ou apenas informamos que foi copiado.
+            alert("PIX COPIA E COLA GERADO E COPIADO!\n\nCole no seu banco para pagar:\n\n" + data.paymentCode);
+            
+            sessionStorage.setItem('hasPurchased', 'true');
+        } else if (data.checkout_url || data.pix_url || data.url) {
+            window.location.href = data.checkout_url || data.pix_url || data.url;
         } else {
+            // Fallback para PerfectPay caso não haja retorno direto
             window.location.href = CHECKOUT_URL;
         }
 
-        toast.success("Redirecionando para o pagamento...", { id: toastId });
     } catch (err) {
         console.error("Erro na integração:", err);
-        toast.error("Sistema de pagamentos instável. Redirecionando para servidor secundário...", { id: toastId });
+        toast.error("Erro ao gerar PIX. Redirecionando para servidor seguro...", { id: toastId });
         
         setTimeout(() => {
             window.location.href = CHECKOUT_URL;
