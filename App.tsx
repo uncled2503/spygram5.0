@@ -6,7 +6,7 @@ import ErrorMessage from '@/src/components/ErrorMessage';
 import ConsentCheckbox from '@/src/components/ConsentCheckbox';
 import { Lock } from 'lucide-react';
 import LoginPage from '@/src/pages/LoginPage';
-import AdminLoginPage from '@/src/pages/AdminLoginPage'; // Novo Login Admin
+import AdminLoginPage from '@/src/pages/AdminLoginPage';
 import ServersPage from '@/src/pages/ServersPage';
 import CreditsPage from '@/src/pages/CreditsPage';
 import MessagesPage from '@/src/pages/MessagesPage';
@@ -19,9 +19,9 @@ import InvasionConcludedPage from '@/src/pages/InvasionConcludedPage';
 import ProfileConfirmationCard from '@/src/components/ProfileConfirmationCard';
 import { MIN_LOADING_DURATION } from './constants';
 import { fetchProfileData } from './src/services/profileService';
-import { AuthProvider } from './src/context/AuthContext';
+import { useAuth } from './src/context/AuthContext';
 import ProtectedRoute from './src/components/ProtectedRoute';
-import AdminProtectedRoute from './src/components/AdminProtectedRoute'; // Novo Protetor Admin
+import AdminProtectedRoute from './src/components/AdminProtectedRoute';
 import { ProfileData, SuggestedProfile, FeedPost } from './types';
 import BackgroundLayout from './src/components/BackgroundLayout';
 import InvasionCounter from '@/src/components/InvasionCounter';
@@ -37,6 +37,7 @@ const MainAppContent: React.FC = () => {
   const [confirmedProfileData, setConfirmedProfileData] = useState<ProfileData | null>(null);
   const [confirmedSuggestions, setConfirmedSuggestions] = useState<SuggestedProfile[]>([]);
   const [confirmedPosts, setConfirmedPosts] = useState<FeedPost[]>([]);
+  const { logout } = useAuth(); // Importado para resetar o estado
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,6 +62,12 @@ const MainAppContent: React.FC = () => {
       setError('Você precisa consentir para acessar o perfil.');
       return;
     }
+
+    // RESET DE FLUXO: Garante que uma nova busca comece do zero
+    logout(); 
+    sessionStorage.removeItem('invasionEndTime');
+    sessionStorage.removeItem('invasionData');
+
     setIsLoading(true);
     setError(null);
     try {
@@ -88,7 +95,7 @@ const MainAppContent: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, hasConsented]);
+  }, [searchQuery, hasConsented, logout]);
 
   const handleConfirmInvasion = useCallback(() => {
     if (confirmedProfileData) {
@@ -147,7 +154,7 @@ const App: React.FC = () => {
           <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/admin" element={<AdminProtectedRoute><AdminPage /></AdminProtectedRoute>} />
-          <Route path="/invasion-simulation" element={<BackgroundLayout><InvasionSimulationPage /></BackgroundLayout>} />
+          <Route path="/invasion-simulation" element={<InvasionSimulationPage />} />
           <Route path="/invasion-concluded" element={<BackgroundLayout><InvasionConcludedPage /></BackgroundLayout>} />
           
           <Route path="/servers" element={<ProtectedRoute><BackgroundLayout><ServersPage /></BackgroundLayout></ProtectedRoute>} />

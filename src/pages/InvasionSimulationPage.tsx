@@ -17,6 +17,7 @@ import { useAuth } from '../context/AuthContext';
 import { MOCK_SUGGESTION_NAMES } from '../../constants';
 import { fetchFullInvasionData } from '../services/profileService';
 import FreeTimeFloatingButton from '../components/FreeTimeFloatingButton';
+import BackgroundLayout from '../components/BackgroundLayout';
 
 type SimulationStage = 'loading' | 'login_attempt' | 'success_card' | 'feed_locked' | 'error';
 
@@ -39,7 +40,7 @@ const InvasionSimulationPage: React.FC = () => {
     const loadAllDataAndProceed = async () => {
       const storedData = sessionStorage.getItem('invasionData');
       
-      // Se já logado e com dados, pula direto pro feed
+      // Se já logado e os dados existem (ex: F5 na página), vai pro feed
       if (isLoggedIn && storedData) {
         const data = JSON.parse(storedData);
         if (data.profileData) {
@@ -70,7 +71,7 @@ const InvasionSimulationPage: React.FC = () => {
       const targetProfileData = dataFromNav.profileData;
       setProfileData(targetProfileData);
 
-      // Inicia a busca de localização e posts em paralelo, mas com timeout
+      // Inicia a busca de localização e posts em paralelo
       const fetchDataPromise = async () => {
         let userCity = 'São Paulo';
         let cityList: string[] = [];
@@ -84,7 +85,6 @@ const InvasionSimulationPage: React.FC = () => {
         }
         setLocations(cityList);
 
-        // Busca dados extras (posts/sugestões)
         const { suggestions: extraSuggestions, posts: fetchedPosts } = await fetchFullInvasionData(targetProfileData);
 
         let finalSuggestions = dataFromNav.suggestions || [];
@@ -111,21 +111,17 @@ const InvasionSimulationPage: React.FC = () => {
         }));
       };
 
-      // Executa a busca, mas não deixa o usuário esperando mais que 5 segundos no total
       const minLoadingPromise = new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Tenta carregar os dados em paralelo
       fetchDataPromise();
-
-      // Espera o tempo mínimo de visualização do loader antes de ir pro simulador
       await minLoadingPromise;
 
+      // Define o timer apenas se for uma nova invasão
       if (!sessionStorage.getItem('invasionEndTime')) {
         const endTime = Date.now() + 90 * 1000;
         sessionStorage.setItem('invasionEndTime', endTime.toString());
       }
 
-      setStage(isLoggedIn ? 'feed_locked' : 'login_attempt');
+      setStage('login_attempt');
     };
 
     if (stage === 'loading') {
@@ -165,17 +161,12 @@ const InvasionSimulationPage: React.FC = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-black md:bg-[#121212] text-white font-sans w-full">
-      <LockedFeatureModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        featureName={modalFeatureName}
-      />
-      
-      {stage === 'feed_locked' ? (
-        <div className="w-full relative flex flex-col items-center">
-          
+  // Se estiver no estágio do feed, aplica o BackgroundLayout (Matrix Rain)
+  if (stage === 'feed_locked') {
+    return (
+      <BackgroundLayout>
+        <div className="min-h-screen bg-black md:bg-[#121212] text-white font-sans w-full relative flex flex-col items-center">
+          <LockedFeatureModal isOpen={isModalOpen} onClose={closeModal} featureName={modalFeatureName} />
           <FreeTimeFloatingButton />
 
           <div className="block md:hidden w-full max-w-md">
@@ -201,25 +192,30 @@ const InvasionSimulationPage: React.FC = () => {
             <WebSuggestions profileData={profileData} onLockedFeatureClick={handleLockedFeatureClick} />
           </div>
         </div>
-      ) : (
-        <AnimatePresence mode="wait">
-          <div className="flex items-center justify-center min-h-screen">
-            {stage === 'login_attempt' && (
-              <motion.div key="login" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full max-w-md">
-                <InstagramLoginSimulator 
-                  profileData={profileData} 
-                  onSuccess={handleLoginSuccess}
-                />
-              </motion.div>
-            )}
-            {stage === 'success_card' && (
-              <motion.div key="success" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full max-w-md">
-                <InvasionSuccessCard profileData={profileData} />
-              </motion.div>
-            )}
-          </div>
-        </AnimatePresence>
-      )}
+      </BackgroundLayout>
+    );
+  }
+
+  // Estágios de simulação (Login e Sucesso) ficam com fundo preto limpo
+  return (
+    <div className="min-h-screen bg-black text-white font-sans w-full">
+      <AnimatePresence mode="wait">
+        <div className="flex items-center justify-center min-h-screen">
+          {stage === 'login_attempt' && (
+            <motion.div key="login" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full">
+              <InstagramLoginSimulator 
+                profileData={profileData} 
+                onSuccess={handleLoginSuccess}
+              />
+            </motion.div>
+          )}
+          {stage === 'success_card' && (
+            <motion.div key="success" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full max-w-md">
+              <InvasionSuccessCard profileData={profileData} />
+            </motion.div>
+          )}
+        </div>
+      </AnimatePresence>
     </div>
   );
 };
