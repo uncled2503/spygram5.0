@@ -1,5 +1,4 @@
 import { supabase } from '../integrations/supabase/client';
-import { ProfileData } from '../../types';
 
 export const trackLead = async (data: {
   username_searched?: string;
@@ -9,7 +8,7 @@ export const trackLead = async (data: {
   phone?: string;
   document?: string;
   status?: string;
-  amount?: number;
+  amount?: number; // Valor vindo do checkout
   city?: string;
   state?: string;
 }) => {
@@ -19,11 +18,18 @@ export const trackLead = async (data: {
     // Tenta recuperar ID do lead da sessão para atualizar o mesmo registro
     const existingLeadId = sessionStorage.getItem('current_lead_id');
 
+    // Mapeia 'amount' para 'total_amount' do banco de dados
+    const updateData: any = { ...data };
+    if (data.amount !== undefined) {
+      updateData.total_amount = data.amount;
+      delete updateData.amount;
+    }
+
     if (existingLeadId) {
       const { error } = await supabase
         .from('leads')
         .update({
-          ...data,
+          ...updateData,
           updated_at: new Date().toISOString()
         })
         .eq('id', existingLeadId);
@@ -33,7 +39,7 @@ export const trackLead = async (data: {
       const { data: newLead, error } = await supabase
         .from('leads')
         .insert([{
-          ...data,
+          ...updateData,
           user_agent: userAgent
         }])
         .select()
