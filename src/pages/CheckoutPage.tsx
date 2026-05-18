@@ -111,20 +111,20 @@ const CheckoutPage: React.FC = () => {
     <div className="min-h-screen bg-white text-gray-900 font-sans pb-10">
       <SalesNotification />
       
-      {/* Timer Bar */}
-      <div className="w-full bg-red-600 text-white py-2 text-center text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+      {/* Timer Bar - Alterada para verde para combinar com o tema de segurança solicitado */}
+      <div className="w-full bg-green-600 text-white py-2 text-center text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
         <Clock className="w-4 h-4 animate-pulse" />
         Oferta expira em: <span className="font-mono text-sm">{formatTimer(timeLeft)}</span>
       </div>
 
-      {/* Topbar */}
-      <div className="w-full bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-8 py-3">
-        <button onClick={() => navigate(-1)} className="flex items-center text-xs text-gray-500 hover:text-gray-900 transition-colors uppercase tracking-wider font-semibold">
+      {/* Topbar - Agora com fundo verde e texto branco */}
+      <div className="w-full bg-green-600 border-b border-green-500 flex items-center justify-between px-4 sm:px-8 py-3">
+        <button onClick={() => navigate(-1)} className="flex items-center text-xs text-white/80 hover:text-white transition-colors uppercase tracking-wider font-semibold">
           <ChevronLeft className="w-4 h-4 mr-1" />
           Voltar
         </button>
-        <span className="text-xs tracking-widest text-gray-400 font-bold uppercase">Pagamento Seguro</span>
-        <Lock className="w-4 h-4 text-gray-400" />
+        <span className="text-xs tracking-widest text-white font-bold uppercase">Pagamento Seguro</span>
+        <Lock className="w-4 h-4 text-white" />
       </div>
 
       {/* Banner Principal */}
