@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'export-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { ProfileData, SuggestedProfile } from '../../types';
 import { ShieldCheck, ChevronDown, Award, Zap, Lock, MapPin, Search } from 'lucide-react';
@@ -78,8 +78,12 @@ const InvasionConcludedPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-transparent text-gray-200 font-sans selection:bg-purple-500/30 overflow-x-hidden">
       
-      {/* Background Decorativo Sutil (Sobreposto ao Matrix) */}
+      {/* Background Decorativo e Camada de Blur */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Camada de Blur aplicada sobre o Matrix Rain */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[3px]" />
+        
+        {/* Gradientes de cor sutis */}
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-900/10 blur-[120px] rounded-full" />
       </div>
