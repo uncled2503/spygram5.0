@@ -189,8 +189,14 @@ const CheckoutPage: React.FC = () => {
       <CheckoutHero />
 
       {/* Banner Principal como Hero (Mobile only) */}
-      <div className="w-full overflow-hidden shadow-lg mb-6 md:hidden">
-        <img src="/banner-topo.png" alt="Banner" className="w-full h-auto block" />
+      <div className="w-full overflow-hidden shadow-lg mb-6 md:hidden relative flex items-center justify-center">
+        {/* Camada de fundo com zoom e blur */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center scale-[1.35] blur-[15px] opacity-70"
+          style={{ backgroundImage: 'url(/banner-topo.png)' }}
+        />
+        {/* Banner principal */}
+        <img src="/banner-topo.png" alt="Banner" className="relative z-10 w-full h-auto block" />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 flex flex-col lg:flex-row gap-10 items-start">
