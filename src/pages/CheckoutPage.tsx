@@ -45,6 +45,9 @@ const CheckoutPage: React.FC = () => {
   });
 
   useEffect(() => {
+    // Garante que a página abra no topo
+    window.scrollTo(0, 0);
+
     // Ao entrar na página, tenta manter o vínculo com o alvo pesquisado
     const invasionDataRaw = sessionStorage.getItem('invasionData');
     const invasionData = invasionDataRaw ? JSON.parse(invasionDataRaw) : null;
