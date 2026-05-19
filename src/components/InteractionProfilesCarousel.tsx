@@ -7,27 +7,29 @@ interface InteractionProfilesCarouselProps {
   profiles: SuggestedProfile[];
 }
 
-// Helper function to mask usernames
+// Função para mascarar usernames (ex: biel****)
 const maskUsername = (username: string) => {
-  if (username.length <= 4) return '*****';
+  if (!username) return '*****';
+  if (username.length <= 4) return username;
   return `${username.substring(0, 4)}****`;
 };
 
 const InteractionProfilesCarousel: React.FC<InteractionProfilesCarouselProps> = ({ profiles }) => {
-  // Duplica perfis para criar um loop de rolagem contínuo
-  const duplicatedProfiles = [...profiles, ...profiles];
-  
-  if (profiles.length === 0) return null;
+  // Se não houver perfis reais, o componente pai já deve lidar com o fallback ou passar uma lista vazia
+  if (!profiles || profiles.length === 0) return null;
 
-  // Configuração da animação de rolagem infinita
+  // Duplicamos os perfis para criar um loop de rolagem infinito e fluido
+  const duplicatedProfiles = [...profiles, ...profiles, ...profiles];
+
+  // Configuração da animação de rolagem linear
   const containerVariants: Variants = {
     animate: {
-      x: ['0%', '-50%'], // Rola do início até a metade (o tamanho do array original)
+      x: ['0%', '-50%'], 
       transition: {
         x: {
           repeat: Infinity,
-          ease: [0, 0, 1, 1], // Easing linear
-          duration: 30, // Velocidade da rolagem
+          ease: "linear",
+          duration: profiles.length * 3.5, // Velocidade proporcional à quantidade de itens
         },
       },
     },
@@ -36,34 +38,48 @@ const InteractionProfilesCarousel: React.FC<InteractionProfilesCarouselProps> = 
   return (
     <div className="w-full overflow-hidden py-4">
       <motion.div
-        className="flex space-x-4"
+        className="flex space-x-5"
         variants={containerVariants}
         animate="animate"
       >
         {duplicatedProfiles.map((profile, index) => {
-          // Aplica blur estático, mas deixa 1 em cada 4 perfis nítido
-          const isBlurred = (index % 4) !== 0; 
+          // Mantemos uma estética de 'protegido' mas usamos os dados REAIS
+          // Alternamos o nível de blur para dar profundidade
+          const isMoreBlurred = (index % 3) === 0;
           
           return (
             <div 
               key={`${profile.username}-${index}`} 
-              className="flex flex-col items-center flex-shrink-0 w-20 text-center cursor-pointer"
+              className="flex flex-col items-center flex-shrink-0 w-24 text-center group"
             >
-              {/* Container da foto com overlay de cadeado */}
-              <div className={`relative w-16 h-16 rounded-full overflow-hidden border-2 transition-all duration-500 ${isBlurred ? 'border-red-500' : 'border-pink-500'}`}>
-                <img 
-                  src={profile.profile_pic_url} 
-                  alt={profile.username} 
-                  className={`w-full h-full object-cover transition-all duration-500 ${isBlurred ? 'blur-sm opacity-70' : 'blur-none opacity-100'}`}
-                />
-                {/* Overlay de Cadeado */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <Lock className="w-6 h-6 text-white drop-shadow-lg" />
-                </div>
+              {/* Container da foto real com overlay de bloqueio */}
+              <div className="relative w-20 h-24 mb-2">
+                 {/* Moldura de Perfil */}
+                 <div className="absolute inset-0 rounded-2xl border-2 border-purple-500/30 group-hover:border-purple-500 transition-colors duration-500"></div>
+                 
+                 <div className="absolute inset-1.5 rounded-xl overflow-hidden bg-gray-900 shadow-2xl">
+                    <img 
+                      src={profile.profile_pic_url} 
+                      alt={profile.username} 
+                      className={`w-full h-full object-cover transition-all duration-700 ${isMoreBlurred ? 'blur-[4px]' : 'blur-[2px]'} group-hover:blur-0 opacity-80 group-hover:opacity-100`}
+                    />
+                    
+                    {/* Overlay de Cadeado/Bloqueio (Somente visual) */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px] group-hover:bg-transparent group-hover:backdrop-blur-none transition-all">
+                      <Lock className="w-6 h-6 text-white/70 drop-shadow-lg" />
+                    </div>
+                 </div>
               </div>
-              <p className={`text-xs mt-1 transition-colors duration-500 ${isBlurred ? 'text-red-400' : 'text-white'}`}>
-                {isBlurred ? '*****' : maskUsername(profile.username)}
+
+              {/* Nome Real Mascarado */}
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter transition-colors group-hover:text-white">
+                @{maskUsername(profile.username)}
               </p>
+              
+              {/* Tag de Relacionamento (Mock para contexto) */}
+              <div className="mt-1 px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 rounded-full">
+                <span className="text-[8px] font-bold text-purple-400 uppercase tracking-widest">Interação Alta</span>
+              </div>
             </div>
           );
         })}

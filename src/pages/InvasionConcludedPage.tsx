@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ProfileData, SuggestedProfile } from '../../types';
 import { ShieldCheck, ChevronDown, Award, Zap, Lock, MapPin, Search } from 'lucide-react';
@@ -15,6 +15,7 @@ import GuaranteeBanner from '../components/GuaranteeBanner';
 import StaticFAQSection from '../components/StaticFAQSection';
 import { motion, AnimatePresence } from 'framer-motion';
 import ShineButton from '../components/ui/ShineButton'; 
+import { MOCK_SUGGESTION_NAMES } from '../../constants';
 
 const SectionDivider = () => (
   <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent my-12" />
@@ -46,12 +47,25 @@ const InvasionConcludedPage: React.FC = () => {
   const [showScrollPrompt, setShowScrollPrompt] = useState(true);
 
   useEffect(() => {
-    const storedData = sessionStorage.getItem('invasionData');
-    if (storedData) {
-      const data = JSON.parse(storedData);
+    const storedDataRaw = sessionStorage.getItem('invasionData');
+    if (storedDataRaw) {
+      const data = JSON.parse(storedDataRaw);
       setProfileData(data.profileData);
-      setSuggestedProfiles(data.suggestedProfiles || []);
       setUserCity(data.userCity || 'Sua Localização');
+
+      // LOGICA DE FALLBACK: Se a API não entregou perfis em comum, gera os mocks
+      if (data.suggestedProfiles && data.suggestedProfiles.length > 0) {
+        setSuggestedProfiles(data.suggestedProfiles);
+      } else {
+        // Mockup fallback
+        const shuffledNames = [...MOCK_SUGGESTION_NAMES].sort(() => 0.5 - Math.random());
+        const mocks = shuffledNames.slice(0, 10).map((name) => ({
+          username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
+          fullName: name,
+          profile_pic_url: '/perfil.jpg', 
+        }));
+        setSuggestedProfiles(mocks);
+      }
     } else {
       navigate('/');
     }
@@ -80,10 +94,7 @@ const InvasionConcludedPage: React.FC = () => {
       
       {/* Background Decorativo e Camada de Blur */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Camada de Blur aplicada sobre o Matrix Rain */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[3px]" />
-        
-        {/* Gradientes de cor sutis */}
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-900/10 blur-[120px] rounded-full" />
       </div>
@@ -106,7 +117,7 @@ const InvasionConcludedPage: React.FC = () => {
           animate={{ opacity: 1 }}
           className="text-center mb-10"
         >
-          <h1 className="text-4xl font-black mb-2 text-white leading-tight">
+          <h1 className="text-4xl font-black mb-2 text-white leading-tight uppercase">
             ALVO <span className="text-purple-500">DOMINADO.</span>
           </h1>
           <p className="text-gray-400 text-sm font-medium">Todos os dados foram extraídos com sucesso.</p>
@@ -122,7 +133,9 @@ const InvasionConcludedPage: React.FC = () => {
               <Award className="w-6 h-6 text-purple-400" />
               <h2 className="text-xl font-black text-white uppercase tracking-tight">Círculo Íntimo</h2>
             </div>
-            <p className="text-sm text-gray-400 mb-6 text-left">Identificamos os perfis que mais trocam mensagens e curtidas com o alvo.</p>
+            <p className="text-sm text-gray-400 mb-6 text-left">Identificamos os perfis que possuem as interações mais frequentes com o alvo.</p>
+            
+            {/* O carrossel agora exibe perfis reais da API prioritariamente */}
             <InteractionProfilesCarousel profiles={suggestedProfiles} />
           </div>
         </section>
@@ -158,7 +171,7 @@ const InvasionConcludedPage: React.FC = () => {
         {/* CTA FINAL E CONFIANÇA */}
         <section className="mt-16 space-y-8">
           <div className="text-center">
-            <h2 className="text-3xl font-black text-white mb-4">PRONTO PARA A VERDADE?</h2>
+            <h2 className="text-3xl font-black text-white mb-4 uppercase">PRONTO PARA A VERDADE?</h2>
             <p className="text-gray-400 text-sm mb-8">Junte-se a mais de 12.000 usuários satisfeitos que usam o SpyGram diariamente.</p>
           </div>
 
