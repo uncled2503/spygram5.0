@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 
@@ -7,12 +7,25 @@ const CITIES = ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba', 'S
 
 const SalesNotification: React.FC = () => {
   const [notification, setNotification] = useState<{ name: string; city: string; time: string } | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    // Inicializa o áudio
+    audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    audioRef.current.volume = 0.4;
+
     const showRandomNotification = () => {
       const name = NAMES[Math.floor(Math.random() * NAMES.length)];
       const city = CITIES[Math.floor(Math.random() * CITIES.length)];
       setNotification({ name, city, time: 'agora mesmo' });
+      
+      // Toca o som de venda
+      if (audioRef.current) {
+        audioRef.current.play().catch(() => {
+          // Navegadores bloqueiam autoplay sem interação prévia
+          console.log("Som bloqueado pelo navegador. Interaja com a página primeiro.");
+        });
+      }
 
       // Oculta após 5 segundos
       setTimeout(() => setNotification(null), 5000);
