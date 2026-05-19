@@ -17,7 +17,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ShineButton from '../components/ui/ShineButton'; 
 import { MOCK_SUGGESTION_NAMES } from '../../constants';
 
-// Helper local para embaralhar
 const shuffle = <T>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
@@ -58,11 +57,9 @@ const InvasionConcludedPage: React.FC = () => {
       setProfileData(data.profileData);
       setUserCity(data.userCity || 'Sua Localização');
 
-      // Usa a ordem que já está salva no storage (sem re-embaralhar)
       if (data.suggestedProfiles && data.suggestedProfiles.length > 0) {
         setSuggestedProfiles(data.suggestedProfiles);
       } else {
-        // Fallback apenas se não houver nada salvo
         const shuffledNames = shuffle([...MOCK_SUGGESTION_NAMES]);
         const mocks = shuffledNames.slice(0, 10).map((name) => ({
           username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
@@ -97,7 +94,6 @@ const InvasionConcludedPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-transparent text-gray-200 font-sans selection:bg-purple-500/30 overflow-x-hidden">
       
-      {/* Background Decorativo e Camada de Blur */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[3px]" />
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[120px] rounded-full" />
@@ -106,7 +102,6 @@ const InvasionConcludedPage: React.FC = () => {
 
       <main className="relative z-10 w-full max-w-[480px] mx-auto px-4 pt-12 pb-24">
         
-        {/* Header de Status */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -116,7 +111,6 @@ const InvasionConcludedPage: React.FC = () => {
           <span className="text-green-400 text-xs font-black uppercase tracking-widest">Invasão 100% Concluída</span>
         </motion.div>
 
-        {/* Título de Impacto */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -128,7 +122,6 @@ const InvasionConcludedPage: React.FC = () => {
           <p className="text-gray-400 text-sm font-medium">Todos os dados foram extraídos com sucesso.</p>
         </motion.div>
 
-        {/* Bloco Conexo: Card de Perfil + Círculo Íntimo */}
         <section className="mb-12 bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden group">
           <ProfileCardDetailed profileData={profileData} />
           
@@ -140,57 +133,49 @@ const InvasionConcludedPage: React.FC = () => {
             </div>
             <p className="text-sm text-gray-400 mb-6 text-left">Identificamos os perfis que possuem as interações mais frequentes com o alvo.</p>
             
-            {/* O carrossel agora exibe perfis na ordem fixa salva no storage */}
             <InteractionProfilesCarousel profiles={suggestedProfiles} />
           </div>
         </section>
 
         <SectionDivider />
 
-        {/* Seção: Localização */}
         <section className="mb-12">
           <RealTimeLocationCard profileData={profileData} userCity={userCity} onUnlockClick={handleUnlockClick} />
         </section>
 
         <SectionDivider />
 
-        {/* Seção: Apps de Namoro */}
         <section className="mb-12">
           <DatingAppCard profileData={profileData} onUnlockClick={handleUnlockClick} />
         </section>
 
         <SectionDivider />
 
-        {/* Seção: Dados Apagados */}
         <section className="mb-12">
           <RecoveredDataCard onUnlockClick={handleUnlockClick} />
         </section>
 
         <SectionDivider />
 
-        {/* Seção: Veículo */}
         <section className="mb-12">
           <LicensePlateLocationCard onUnlockClick={handleUnlockClick} userCity={userCity} />
         </section>
 
-        {/* CTA FINAL E CONFIANÇA */}
         <section className="mt-16 space-y-8">
           <div className="text-center">
             <h2 className="text-3xl font-black text-white mb-4 uppercase">PRONTO PARA A VERDADE?</h2>
             <p className="text-gray-400 text-sm mb-8">Junte-se a mais de 12.000 usuários satisfeitos que usam o SpyGram diariamente.</p>
           </div>
 
-          <PriceDiscountCard originalPrice="R$ 97,90" discountedPrice="R$ 37,00" onUnlockClick={handleUnlockClick} />
+          <PriceDiscountCard originalPrice="R$ 97,90" discountedPrice="R$ 1,00" onUnlockClick={handleUnlockClick} />
         </section>
 
         <SectionDivider />
 
-        {/* FAQ e Garantia */}
         <LiveChatFAQ />
         <GuaranteeBanner onUnlockClick={handleUnlockClick} />
         <StaticFAQSection />
 
-        {/* Rodapé Final */}
         <footer className="mt-20 text-center pb-10">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-4">
             <ShieldCheck className="w-4 h-4 text-green-500" />
