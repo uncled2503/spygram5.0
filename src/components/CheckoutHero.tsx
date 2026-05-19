@@ -3,7 +3,7 @@ import { ShoppingCart } from 'lucide-react';
 
 const CheckoutHero: React.FC = () => {
   return (
-    <div className="hidden md:flex flex-col items-center w-full max-w-6xl mx-auto pt-12 pb-4 px-4">
+    <div className="hidden md:flex flex-col items-center w-full max-w-6xl mx-auto pt-0 pb-4 px-4">
       {/* Imagem de Destaque Fornecida */}
       <div className="w-full mb-8 overflow-hidden rounded-[2.5rem]">
         <img 
