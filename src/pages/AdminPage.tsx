@@ -74,15 +74,23 @@ const AdminPage: React.FC = () => {
   };
 
   const handleDeleteLead = async (id: string, username: string) => {
-    if (!window.confirm(`Tem certeza que deseja deletar o lead @${username}?`)) return;
+    if (!window.confirm(`⚠️ AVISO: Isso excluirá PERMANENTEMENTE o lead @${username} e todos os seus dados. Continuar?`)) return;
+
+    const toastId = toast.loading(`Excluindo @${username}...`);
 
     try {
-      const { error } = await supabase.from('leads').delete().eq('id', id);
-      if (error) throw error;
-      toast.success(`Lead @${username} deletado.`);
+      // Chamamos a Edge Function administrativa para garantir a exclusão
+      const { data, error } = await supabase.functions.invoke('delete-lead', {
+        body: { leadId: id },
+      });
+
+      if (error || data?.error) throw new Error(error?.message || data?.error);
+
+      toast.success(`Lead @${username} removido com sucesso.`, { id: toastId });
       setLeads(prev => prev.filter(l => l.id !== id));
     } catch (error: any) {
-      toast.error('Erro ao deletar: ' + error.message);
+      console.error('Erro ao deletar lead:', error);
+      toast.error('Falha na exclusão: ' + error.message, { id: toastId });
     }
   };
 
