@@ -336,7 +336,6 @@ const CheckoutPage: React.FC = () => {
         <div className="w-full bg-white border border-gray-100 rounded-2xl py-6 px-10 flex flex-col md:flex-row justify-between items-center gap-8 shadow-sm">
            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">E-MAIL DE SUPORTE: contato@spygram.com.br</p>
            <div className="flex items-center gap-8">
-              <img src="https://perfectpay.com.br/img/logo-perfectpay.svg" alt="PerfectPay" className="h-5 opacity-40 grayscale" />
               <div className="bg-[#78cc6d] text-white py-2 px-6 rounded-full inline-flex items-center gap-3 text-[10px] font-black uppercase shadow-sm">
                 <ShieldCheck size={16} /> COMPRA 100% SEGURA
               </div>
