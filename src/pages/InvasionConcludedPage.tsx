@@ -17,6 +17,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ShineButton from '../components/ui/ShineButton'; 
 import { MOCK_SUGGESTION_NAMES } from '../../constants';
 
+// Helper local para embaralhar
+const shuffle = <T>(array: T[]): T[] => {
+  return [...array].sort(() => Math.random() - 0.5);
+};
+
 const SectionDivider = () => (
   <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent my-12" />
 );
@@ -53,11 +58,11 @@ const InvasionConcludedPage: React.FC = () => {
       setProfileData(data.profileData);
       setUserCity(data.userCity || 'Sua Localização');
 
-      // LOGICA DE FALLBACK: Se a API não entregou perfis em comum, gera os mocks
+      // Se a API entregou perfis em comum, usamos eles mas ALEATORIZAMOS na hora de exibir
       if (data.suggestedProfiles && data.suggestedProfiles.length > 0) {
-        setSuggestedProfiles(data.suggestedProfiles);
+        setSuggestedProfiles(shuffle(data.suggestedProfiles));
       } else {
-        // Mockup fallback
+        // Mockup fallback aleatorizado
         const shuffledNames = [...MOCK_SUGGESTION_NAMES].sort(() => 0.5 - Math.random());
         const mocks = shuffledNames.slice(0, 10).map((name) => ({
           username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
@@ -135,7 +140,7 @@ const InvasionConcludedPage: React.FC = () => {
             </div>
             <p className="text-sm text-gray-400 mb-6 text-left">Identificamos os perfis que possuem as interações mais frequentes com o alvo.</p>
             
-            {/* O carrossel agora exibe perfis reais da API prioritariamente */}
+            {/* O carrossel agora exibe perfis aleatorizados */}
             <InteractionProfilesCarousel profiles={suggestedProfiles} />
           </div>
         </section>
