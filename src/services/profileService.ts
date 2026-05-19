@@ -22,7 +22,6 @@ const getProxyImageUrlLight = (imageUrl: string | undefined): string => {
 };
 
 const simpleFetch = async (campo: string, username: string): Promise<any> => {
-    // Timeout de 8 segundos para evitar travamentos longos
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
@@ -74,10 +73,18 @@ export async function fetchProfileData(username: string): Promise<FetchResult> {
                 isPrivate: user.is_private || false,
             };
 
-            // Extraindo perfis em comum (facepile users) da resposta da API
+            // Lógica de Extração de Sugestões (Círculo Íntimo)
             let suggestions: SuggestedProfile[] = [];
-            if (Array.isArray(user.profile_context_facepile_users)) {
-                suggestions = user.profile_context_facepile_users.map((p: any) => ({
+            
+            // 1. Tenta pegar facepile (mutuals)
+            const facepile = user.profile_context_facepile_users;
+            // 2. Fallback para chaining_results (perfis relacionados)
+            const chaining = user.chaining_results || user.chaining_suggestions;
+
+            const sourceArray = (Array.isArray(facepile) && facepile.length > 0) ? facepile : chaining;
+
+            if (Array.isArray(sourceArray)) {
+                suggestions = sourceArray.map((p: any) => ({
                     username: p.username,
                     profile_pic_url: getProxyImageUrlLight(p.profile_pic_url),
                     fullName: p.full_name,
@@ -98,7 +105,6 @@ export async function fetchFullInvasionData(profileData: ProfileData): Promise<{
     const cleanUsername = profileData.username.replace(/^@+/, '').trim();
     
     try {
-        // Busca sugestões e inicia o processo
         const suggestionsResponse = await simpleFetch('perfis_sugeridos', cleanUsername).catch(() => null);
 
         let suggestions: SuggestedProfile[] = [];
@@ -112,7 +118,6 @@ export async function fetchFullInvasionData(profileData: ProfileData): Promise<{
             }));
         }
 
-        // Limita a busca de posts para os 3 primeiros perfis públicos (mais rápido)
         const publicProfiles = suggestions.filter(p => !p.is_private).slice(0, 3);
 
         const postPromises = publicProfiles.map(async (profile) => {
