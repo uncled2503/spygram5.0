@@ -42,12 +42,19 @@ const MessagesPage: React.FC = () => {
   const [modalFeatureName, setModalFeatureName] = useState('');
 
   useEffect(() => {
-    const storedData = sessionStorage.getItem('invasionData');
-    if (storedData) {
-      const data = JSON.parse(storedData);
+    const storedDataRaw = sessionStorage.getItem('invasionData');
+    if (storedDataRaw) {
+      const data = JSON.parse(storedDataRaw);
       setProfileData(data.profileData);
 
-      // Garante que existam perfis sugeridos usando mockups se necessário
+      // Se já houver mensagens geradas para este lead, usamos elas
+      if (data.generatedStories && data.generatedMessages) {
+        setStories(data.generatedStories);
+        setMessages(data.generatedMessages);
+        return;
+      }
+
+      // Caso contrário, geramos uma vez e salvamos
       let suggestedProfiles: SuggestedProfile[] = data.suggestedProfiles || [];
       
       if (suggestedProfiles.length === 0) {
@@ -65,7 +72,6 @@ const MessagesPage: React.FC = () => {
         note: ['Preguiça Hoje 🥱🥱', 'Coração Partido (Ao Vivo)', 'O vontde fudê a 3 😈', '📍💦 São Paulo'][index % 4],
         avatar: profile.profile_pic_url,
       }));
-      setStories(suggestedStories);
 
       const messagePreviews = [
         '4 novas mensagens',
@@ -99,6 +105,15 @@ const MessagesPage: React.FC = () => {
         };
       });
       
+      // Salva no sessionStorage dentro do objeto de invasão atual
+      const updatedData = {
+        ...data,
+        generatedStories: suggestedStories,
+        generatedMessages: suggestedMessages
+      };
+      sessionStorage.setItem('invasionData', JSON.stringify(updatedData));
+
+      setStories(suggestedStories);
       setMessages(suggestedMessages);
 
     } else {
