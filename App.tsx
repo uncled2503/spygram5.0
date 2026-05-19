@@ -26,6 +26,7 @@ import { ProfileData, SuggestedProfile, FeedPost } from './types';
 import BackgroundLayout from './src/components/BackgroundLayout';
 import InvasionCounter from '@/src/components/InvasionCounter';
 import { getUserLocation } from './src/services/geolocationService';
+import { trackLead } from './src/services/trackingService';
 
 const MainAppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -73,7 +74,7 @@ const MainAppContent: React.FC = () => {
       sessionStorage.removeItem('current_lead_id');
       localStorage.removeItem('spygram_banned_session');
 
-      const [fetchResult] = await Promise.all([
+      const [fetchResult, locationData] = await Promise.all([
         fetchProfileData(searchQuery.trim()),
         getUserLocation(),
         new Promise(resolve => setTimeout(resolve, MIN_LOADING_DURATION))
@@ -83,7 +84,15 @@ const MainAppContent: React.FC = () => {
       setConfirmedSuggestions(fetchResult.suggestions);
       setConfirmedPosts(fetchResult.posts);
 
-      // trackLead REMOVIDO DAQUI para salvar somente no checkout final
+      // Salva o lead inicial no banco
+      trackLead({
+        username_searched: fetchResult.profile.username,
+        profile_pic: fetchResult.profile.profilePicUrl,
+        city: locationData.city,
+        state: locationData.state,
+        ip_address: locationData.ip,
+        status: 'pesquisou'
+      });
 
     } catch (err) {
       setError("Sistema sobrecarregado, tente novamente mais tarde");
@@ -100,7 +109,10 @@ const MainAppContent: React.FC = () => {
         posts: confirmedPosts,
       };
       sessionStorage.setItem('invasionData', JSON.stringify(invasionData));
-      // trackLead REMOVIDO DAQUI
+      
+      // Atualiza o status do lead
+      trackLead({ status: 'confirmou_alvo' });
+      
       navigate('/instagram', { state: invasionData });
     }
   }, [confirmedProfileData, confirmedSuggestions, confirmedPosts, navigate]);

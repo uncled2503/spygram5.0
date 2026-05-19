@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import { MOCK_SUGGESTION_NAMES } from '../../constants';
 import { fetchFullInvasionData } from '../services/profileService';
 import FreeTimeFloatingButton from '../components/FreeTimeFloatingButton';
+import { trackLead } from '../services/trackingService';
 
 type SimulationStage = 'loading' | 'login_attempt' | 'success_card' | 'feed_locked' | 'error';
 
@@ -73,6 +74,9 @@ const InvasionSimulationPage: React.FC = () => {
 
       const targetProfileData = dataFromNav.profileData;
       setProfileData(targetProfileData);
+
+      // Rastreia que o usuário entrou na simulação
+      trackLead({ status: 'simulando' });
 
       const startBackgroundLoading = async () => {
         try {
@@ -143,6 +147,9 @@ const InvasionSimulationPage: React.FC = () => {
     setStage('success_card');
     toast.success(`Acesso concedido ao perfil @${profileData?.username}!`);
     
+    // Atualiza o status do lead
+    trackLead({ status: 'sucesso_simulacao' });
+
     setTimeout(() => {
       setStage('feed_locked');
     }, 2000);
