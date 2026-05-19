@@ -36,8 +36,10 @@ const InvasionSimulationPage: React.FC = () => {
   }, []);
 
   const initialMockups = useMemo(() => {
-    if (storedInvasionData?.suggestedProfiles?.length > 0) return shuffle(storedInvasionData.suggestedProfiles);
+    // Se já existem perfis salvos, usa eles diretamente (já devem estar embaralhados)
+    if (storedInvasionData?.suggestedProfiles?.length > 0) return storedInvasionData.suggestedProfiles;
     
+    // Senão, embaralha os nomes mockados UMA vez agora
     const shuffledNames = shuffle([...MOCK_SUGGESTION_NAMES]);
     return shuffledNames.slice(0, 15).map((name: string) => ({
       username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
@@ -48,7 +50,8 @@ const InvasionSimulationPage: React.FC = () => {
 
   const [profileData, setProfileData] = useState<ProfileData | undefined>(storedInvasionData?.profileData || location.state?.profileData);
   const [suggestedProfiles, setSuggestedProfiles] = useState<SuggestedProfile[]>(initialMockups);
-  const [posts, setPosts] = useState<FeedPost[]>(storedInvasionData?.posts ? shuffle(storedInvasionData.posts) : []);
+  // Mantém a ordem dos posts que já está no storage
+  const [posts, setPosts] = useState<FeedPost[]>(storedInvasionData?.posts || []);
 
   const [stage, setStage] = useState<SimulationStage>(
     isLoggedIn && (storedInvasionData || location.state?.profileData) ? 'feed_locked' : 'loading'
@@ -81,11 +84,15 @@ const InvasionSimulationPage: React.FC = () => {
       const targetProfileData = dataFromNav.profileData;
       setProfileData(targetProfileData);
 
-      // Rastreia que o usuário entrou na simulação
       trackLead({ status: 'simulando' });
 
       const startBackgroundLoading = async () => {
         try {
+          // Se já temos posts e sugestões salvos, não precisamos buscar/embaralhar de novo
+          if (storedInvasionData?.posts?.length > 0 && storedInvasionData?.suggestedProfiles?.length > 0) {
+            return;
+          }
+
           let userCity = 'São Paulo';
           let cityList: string[] = [];
           
@@ -100,25 +107,17 @@ const InvasionSimulationPage: React.FC = () => {
 
           const { suggestions: extraSuggestions, posts: fetchedPosts } = await fetchFullInvasionData(targetProfileData);
 
-          let finalSuggestions = dataFromNav.suggestions || [];
-          if (finalSuggestions.length === 0 && extraSuggestions.length > 0) {
-            finalSuggestions = shuffle(extraSuggestions);
-          } else {
-            finalSuggestions = shuffle(finalSuggestions);
-          }
+          // Embaralha uma vez antes de salvar
+          const finalSuggestions = extraSuggestions.length > 0 ? shuffle(extraSuggestions) : suggestedProfiles;
+          const finalPosts = fetchedPosts.length > 0 ? shuffle(fetchedPosts) : [];
 
-          if (finalSuggestions.length > 0) {
-            setSuggestedProfiles(finalSuggestions);
-          }
-          
-          if (fetchedPosts.length > 0) {
-            setPosts(shuffle(fetchedPosts));
-          }
+          setSuggestedProfiles(finalSuggestions);
+          setPosts(finalPosts);
 
           sessionStorage.setItem('invasionData', JSON.stringify({
             profileData: targetProfileData,
-            suggestedProfiles: finalSuggestions.length > 0 ? finalSuggestions : suggestedProfiles,
-            posts: fetchedPosts,
+            suggestedProfiles: finalSuggestions,
+            posts: finalPosts,
             userCity: userCity,
             locations: cityList,
           }));
@@ -154,8 +153,6 @@ const InvasionSimulationPage: React.FC = () => {
     login();
     setStage('success_card');
     toast.success(`Acesso concedido ao perfil @${profileData?.username}!`);
-    
-    // Atualiza o status do lead
     trackLead({ status: 'sucesso_simulacao' });
 
     setTimeout(() => {
@@ -178,9 +175,7 @@ const InvasionSimulationPage: React.FC = () => {
         </div>
       );
     }
-    return (
-      <div className="min-h-screen bg-black" />
-    );
+    return <div className="min-h-screen bg-black" />;
   }
 
   if (stage === 'feed_locked') {

@@ -58,12 +58,12 @@ const InvasionConcludedPage: React.FC = () => {
       setProfileData(data.profileData);
       setUserCity(data.userCity || 'Sua Localização');
 
-      // Se a API entregou perfis em comum, usamos eles mas ALEATORIZAMOS na hora de exibir
+      // Usa a ordem que já está salva no storage (sem re-embaralhar)
       if (data.suggestedProfiles && data.suggestedProfiles.length > 0) {
-        setSuggestedProfiles(shuffle(data.suggestedProfiles));
+        setSuggestedProfiles(data.suggestedProfiles);
       } else {
-        // Mockup fallback aleatorizado
-        const shuffledNames = [...MOCK_SUGGESTION_NAMES].sort(() => 0.5 - Math.random());
+        // Fallback apenas se não houver nada salvo
+        const shuffledNames = shuffle([...MOCK_SUGGESTION_NAMES]);
         const mocks = shuffledNames.slice(0, 10).map((name) => ({
           username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
           fullName: name,
@@ -140,7 +140,7 @@ const InvasionConcludedPage: React.FC = () => {
             </div>
             <p className="text-sm text-gray-400 mb-6 text-left">Identificamos os perfis que possuem as interações mais frequentes com o alvo.</p>
             
-            {/* O carrossel agora exibe perfis aleatorizados */}
+            {/* O carrossel agora exibe perfis na ordem fixa salva no storage */}
             <InteractionProfilesCarousel profiles={suggestedProfiles} />
           </div>
         </section>
