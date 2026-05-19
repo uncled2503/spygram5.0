@@ -14,8 +14,15 @@ const WhatsAppButton: React.FC = () => {
     isLoggedIn = false;
   }
 
+  // Lista de caminhos onde o botão do WhatsApp DEVE ser ocultado (Mockup do Instagram)
   const hiddenPaths = ['/instagram', '/messages', '/chat'];
-  const shouldHide = hiddenPaths.some(path => location.pathname.startsWith(path));
+  
+  // Verifica se a rota atual começa com algum dos caminhos a ocultar
+  const shouldHide = hiddenPaths.some(path => {
+    // Normaliza caminhos com barras adicionais
+    const currentPath = location.pathname.toLowerCase();
+    return currentPath === path || currentPath.startsWith(path + '/');
+  });
 
   if (shouldHide) {
     return null;
