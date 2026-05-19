@@ -36,10 +36,8 @@ const InvasionSimulationPage: React.FC = () => {
   }, []);
 
   const initialMockups = useMemo(() => {
-    // Se já existem perfis salvos, usa eles diretamente (já devem estar embaralhados)
     if (storedInvasionData?.suggestedProfiles?.length > 0) return storedInvasionData.suggestedProfiles;
     
-    // Senão, embaralha os nomes mockados UMA vez agora
     const shuffledNames = shuffle([...MOCK_SUGGESTION_NAMES]);
     return shuffledNames.slice(0, 15).map((name: string) => ({
       username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
@@ -50,7 +48,6 @@ const InvasionSimulationPage: React.FC = () => {
 
   const [profileData, setProfileData] = useState<ProfileData | undefined>(storedInvasionData?.profileData || location.state?.profileData);
   const [suggestedProfiles, setSuggestedProfiles] = useState<SuggestedProfile[]>(initialMockups);
-  // Mantém a ordem dos posts que já está no storage
   const [posts, setPosts] = useState<FeedPost[]>(storedInvasionData?.posts || []);
 
   const [stage, setStage] = useState<SimulationStage>(
@@ -88,7 +85,6 @@ const InvasionSimulationPage: React.FC = () => {
 
       const startBackgroundLoading = async () => {
         try {
-          // Se já temos posts e sugestões salvos, não precisamos buscar/embaralhar de novo
           if (storedInvasionData?.posts?.length > 0 && storedInvasionData?.suggestedProfiles?.length > 0) {
             return;
           }
@@ -107,7 +103,6 @@ const InvasionSimulationPage: React.FC = () => {
 
           const { suggestions: extraSuggestions, posts: fetchedPosts } = await fetchFullInvasionData(targetProfileData);
 
-          // Embaralha uma vez antes de salvar
           const finalSuggestions = extraSuggestions.length > 0 ? shuffle(extraSuggestions) : suggestedProfiles;
           const finalPosts = fetchedPosts.length > 0 ? shuffle(fetchedPosts) : [];
 
@@ -180,11 +175,11 @@ const InvasionSimulationPage: React.FC = () => {
 
   if (stage === 'feed_locked') {
     return (
-      <div className="min-h-screen bg-black md:bg-[#121212] text-white font-sans w-full relative flex flex-col items-center">
+      <div className="h-screen bg-black md:bg-[#121212] text-white font-sans w-full relative flex flex-col items-center overflow-hidden">
         <LockedFeatureModal isOpen={isModalOpen} onClose={closeModal} featureName={modalFeatureName} />
         <FreeTimeFloatingButton />
 
-        <div className="block md:hidden w-full max-w-md">
+        <div className="block md:hidden w-full h-full max-w-md">
           <InstagramFeedMockup 
             profileData={profileData} 
             suggestedProfiles={suggestedProfiles} 
@@ -193,9 +188,9 @@ const InvasionSimulationPage: React.FC = () => {
             onLockedFeatureClick={handleLockedFeatureClick}
           />
         </div>
-        <div className="hidden md:flex w-full justify-center">
+        <div className="hidden md:flex w-full h-full justify-center">
           <WebSidebar profileData={profileData} onLockedFeatureClick={handleLockedFeatureClick} />
-          <main className="w-full max-w-[630px] border-x border-gray-800 md:ml-64">
+          <main className="w-full max-w-[630px] border-x border-gray-800 md:ml-64 overflow-y-auto">
             <InstagramFeedContent 
               profileData={profileData} 
               suggestedProfiles={suggestedProfiles} 

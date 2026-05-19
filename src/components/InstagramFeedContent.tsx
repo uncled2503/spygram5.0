@@ -5,7 +5,7 @@ import { ProfileData, SuggestedProfile, FeedPost } from '../../types';
 
 // Helper function to mask usernames
 const maskUsername = (username: string) => {
-  if (username.length <= 4) return username; // Não mascara nomes curtos (como os gerados)
+  if (username.length <= 4) return username; 
   if (username.length <= 3) return '*******';
   return `${username.substring(0, 3).toLowerCase()}****`;
 };
@@ -15,7 +15,7 @@ interface ClickableProps {
 }
 
 const InstagramHeader: React.FC<ClickableProps> = ({ onLockedFeatureClick }) => (
-  <header className="grid grid-cols-3 items-center px-4 py-2 border-b border-gray-800 bg-black sticky top-0 z-10 md:hidden">
+  <header className="grid grid-cols-3 items-center px-4 py-2 border-b border-gray-800 bg-black flex-shrink-0 md:hidden">
     <button onClick={() => onLockedFeatureClick('criar uma publicação')} className="flex justify-start">
       <img src="/icons/add-content.png" alt="Criar" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
     </button>
@@ -32,7 +32,7 @@ const InstagramHeader: React.FC<ClickableProps> = ({ onLockedFeatureClick }) => 
 const InstagramFooter: React.FC<{ profileData: ProfileData } & ClickableProps> = ({ profileData, onLockedFeatureClick }) => {
   const navigate = useNavigate();
   return (
-    <footer className="flex justify-around items-center py-3 border-t border-gray-800 bg-black sticky bottom-0 z-10 md:hidden">
+    <footer className="flex justify-around items-center py-3 border-t border-gray-800 bg-black flex-shrink-0 md:hidden">
       <button onClick={() => onLockedFeatureClick('acessar a página inicial')}>
         <img src="/icons/home.png" alt="Página Inicial" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
       </button>
@@ -112,7 +112,6 @@ const RealPost: React.FC<{ postData: FeedPost; location?: string } & ClickablePr
   );
 };
 
-// Post bloqueado agora aceita dados reais para o cabeçalho
 const LockedPost: React.FC<{ 
   username: string; 
   profilePicUrl: string; 
@@ -172,9 +171,11 @@ const InstagramFeedContent: React.FC<InstagramFeedContentProps> = ({ profileData
       <div className="flex-1 overflow-y-auto scrollbar-hide">
         <div className="flex p-3 space-x-4 border-b border-gray-800 overflow-x-auto flex-shrink-0 scrollbar-hide">
           <div onClick={() => onLockedFeatureClick('criar um story')} className="flex flex-col items-center flex-shrink-0 space-y-1 cursor-pointer">
-            <div className="relative"><img src={profileData.profilePicUrl} alt="Seu story" className="w-16 h-16 rounded-full object-cover" />
+            <div className="relative">
+              <img src={profileData.profilePicUrl} alt="Seu story" className="w-16 h-16 rounded-full object-cover" />
               <div className="absolute bottom-0 right-0 w-6 h-6 bg-blue-500 rounded-full border-2 border-black flex items-center justify-center"><Plus className="w-4 h-4 text-white" /></div>
-            </div><span className="text-xs text-gray-400">Seu story</span>
+            </div>
+            <span className="text-xs text-gray-400">Seu story</span>
           </div>
           {suggestedProfiles.map((story, index) => {
             const isCloseFriend = index < 3;
@@ -187,12 +188,12 @@ const InstagramFeedContent: React.FC<InstagramFeedContentProps> = ({ profileData
                 <div className={`w-[70px] h-[70px] rounded-full flex items-center justify-center p-0.5 ${ringClasses}`}>
                   <div className="bg-black p-1 rounded-full relative">
                     <img src={story.profile_pic_url} alt={story.username} className="w-full h-full rounded-full object-cover" />
-                    {/* Lock Overlay */}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
                       <Lock className="w-6 h-6 text-white drop-shadow-lg" />
                     </div>
                   </div>
-                </div><span className="text-xs text-white mt-1 truncate w-16">{maskUsername(story.username)}</span>
+                </div>
+                <span className="text-xs text-white mt-1 truncate w-16">{maskUsername(story.username)}</span>
               </div>
             );
           })}
