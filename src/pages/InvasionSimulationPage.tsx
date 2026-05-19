@@ -19,7 +19,7 @@ import FreeTimeFloatingButton from '../components/FreeTimeFloatingButton';
 import { trackLead } from '../services/trackingService';
 
 // Função auxiliar para embaralhar arrays sem causar conflito com JSX
-function shuffle<T>(array: T[]): T[] {
+function shuffle(array: any[]): any[] {
   return [...array].sort(() => Math.random() - 0.5);
 }
 

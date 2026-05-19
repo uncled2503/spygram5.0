@@ -18,7 +18,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ShineButton from '../components/ui/ShineButton'; 
 import { MOCK_SUGGESTION_NAMES } from '../../constants';
 
-function shuffle<T>(array: T[]): T[] {
+// Modificado para evitar uso de genéricos que conflitam com JSX no parser do esbuild
+function shuffle(array: any[]): any[] {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
@@ -62,7 +63,7 @@ const InvasionConcludedPage: React.FC = () => {
         setSuggestedProfiles(data.suggestedProfiles);
       } else {
         const shuffledNames = shuffle([...MOCK_SUGGESTION_NAMES]);
-        const mocks = shuffledNames.slice(0, 10).map((name) => ({
+        const mocks = shuffledNames.slice(0, 10).map((name: any) => ({
           username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
           fullName: name,
           profile_pic_url: '/perfil.jpg', 
