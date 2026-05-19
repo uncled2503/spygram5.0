@@ -18,7 +18,7 @@ import { fetchFullInvasionData } from '../services/profileService';
 import FreeTimeFloatingButton from '../components/FreeTimeFloatingButton';
 import { trackLead } from '../services/trackingService';
 
-// Função auxiliar para embaralhar arrays
+// Função auxiliar para embaralhar arrays sem causar conflito com JSX
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
 }
