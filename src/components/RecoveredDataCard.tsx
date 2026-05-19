@@ -112,7 +112,7 @@ const RecoveredDataCard: React.FC<RecoveredDataCardProps> = ({ onUnlockClick }) 
                   <img 
                     src={src} 
                     alt="Recuperada" 
-                    className="w-full h-full object-cover blur-[4px] scale-110" 
+                    className="w-full h-full object-cover blur-[3.6px] scale-110" 
                     onError={(e) => { e.currentTarget.src = '/perfil.jpg' }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30">
