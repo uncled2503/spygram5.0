@@ -191,12 +191,17 @@ const CheckoutPage: React.FC = () => {
       <div className="max-w-xl mx-auto px-4 flex flex-col items-center">
         
         {/* Adquirindo Card - Mesclado */}
-        <div className="w-full bg-white/60 rounded-2xl p-5 flex items-center gap-5 mb-10 border border-gray-200/50 shadow-sm">
+        <div className="w-full bg-white/60 rounded-2xl p-5 flex items-center gap-5 mb-6 border border-gray-200/50 shadow-sm">
            <div className="p-3 bg-white rounded-xl shadow-sm"><ShoppingCart size={22} className="text-[#78cc6d]" /></div>
            <div className="flex flex-col">
               <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Você está adquirindo:</span>
               <span className="text-sm font-black text-gray-800">Relatório SpyGram Completo</span>
            </div>
+        </div>
+
+        {/* Segundo Banner Adicionado */}
+        <div className="w-full mb-10 overflow-hidden rounded-2xl shadow-lg">
+           <img src="/logoapp.png" alt="Vantagens SpyGram" className="w-full h-auto block" />
         </div>
 
         {/* Form Container */}
