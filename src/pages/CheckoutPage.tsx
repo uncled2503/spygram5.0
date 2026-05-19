@@ -60,44 +60,13 @@ const CheckoutPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Monitoramento do status do lead em tempo real
-  useEffect(() => {
-    if (pixData && !paymentConfirmed) {
-      const currentLeadId = sessionStorage.getItem('current_lead_id');
-      if (!currentLeadId) return;
-
-      const subscription = supabase
-        .channel('lead-status')
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'leads',
-            filter: `id=eq.${currentLeadId}`
-          },
-          (payload) => {
-            if (payload.new.status === 'pagou') {
-              setPaymentConfirmed(true);
-              toast.success("Pagamento confirmado com sucesso!");
-            }
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(subscription);
-      };
-    }
-  }, [pixData, paymentConfirmed]);
-
   const formatTimer = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
-  const basePrice = 1.00; // Alterado temporariamente para R$ 1,00 para testes
+  const basePrice = 1.00; 
   const bumpDetails = {
     pro: { title: 'ACESSO VITALÍCIO PRO', price: 9.90, img: '/order-bumps/vitalicio.jpg', desc: 'Tenha acesso permanente a ferramenta SpyGram PRO!', checkText: 'ADQUIRIR TAMBÉM ACESSO VITALÍCIO AO SPYGRAM PRO ✅ À VISTA POR R$ 9,90' },
     social: { title: 'ESPIÃO SOCIAL COMPLETO', price: 19.90, img: '/order-bumps/social.jpg', desc: 'Tenha acesso a todas as redes sociais de quem você quiser!', checkText: 'ADQUIRIR TAMBÉM ESPIÃO INSTAGRAM + FACEBOOK + WHATSAPP À VISTA POR R$ 19,90' },
@@ -128,17 +97,6 @@ const CheckoutPage: React.FC = () => {
     const currentLeadId = sessionStorage.getItem('current_lead_id');
     const invasionDataRaw = sessionStorage.getItem('invasionData');
     const invasionData = invasionDataRaw ? JSON.parse(invasionDataRaw) : null;
-
-    await trackLead({
-      username_searched: invasionData?.profileData?.username,
-      profile_pic: invasionData?.profileData?.profilePicUrl,
-      email: formData.email,
-      phone: formData.whatsapp,
-      full_name: formData.nome,
-      document: formData.documento,
-      status: 'gerou_pix',
-      amount: total
-    });
 
     try {
         const { data, error } = await supabase.functions.invoke('royal-banking-payment', {
@@ -172,7 +130,7 @@ const CheckoutPage: React.FC = () => {
         }
 
     } catch (err) {
-        toast.error("Erro ao gerar PIX. Redirecionando...", { id: toastId });
+        toast.error("Erro ao gerar PIX. Redirecionando...");
         setTimeout(() => window.location.href = CHECKOUT_URL, 2000);
     } finally {
         setIsProcessing(false);
@@ -208,17 +166,16 @@ const CheckoutPage: React.FC = () => {
           transactionId={pixData.idTransaction}
           amount={pixData.amount}
           leadData={pixData.leadInfo}
-          onConfirm={() => {
-            const checkStatus = async () => {
-              const leadId = sessionStorage.getItem('current_lead_id');
-              const { data } = await supabase.from('leads').select('status').eq('id', leadId).single();
-              if (data?.status === 'pagou') {
-                setPaymentConfirmed(true);
-              } else {
-                toast.error("Pagamento ainda não identificado.");
-              }
-            };
-            checkStatus();
+          onSuccess={() => setPaymentConfirmed(true)} // Liberação automática ao detectar pagamento
+          onConfirm={async () => {
+            // Verificação manual forçada ao clicar
+            const leadId = sessionStorage.getItem('current_lead_id');
+            const { data } = await supabase.from('leads').select('status').eq('id', leadId).single();
+            if (data?.status === 'pagou') {
+              setPaymentConfirmed(true);
+            } else {
+              toast.error("Pagamento ainda não identificado no sistema.");
+            }
           }}
         />
       </div>

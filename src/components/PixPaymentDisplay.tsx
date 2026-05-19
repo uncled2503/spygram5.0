@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Copy, Check, Clock, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { trackLead } from '../services/trackingService';
+import { supabase } from '../integrations/supabase/client';
 
 interface PixPaymentDisplayProps {
   paymentCode: string;
@@ -9,7 +10,7 @@ interface PixPaymentDisplayProps {
   transactionId: string;
   amount: number;
   onConfirm: () => void;
-  // Novos dados para o rastreamento automático
+  onSuccess?: () => void; // Callback para quando o pagamento for detectado
   leadData?: {
     nome: string;
     email: string;
@@ -26,6 +27,7 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
   transactionId, 
   amount,
   onConfirm,
+  onSuccess,
   leadData
 }) => {
   const TOTAL_TIME = 600; // 10 minutos em segundos
@@ -33,10 +35,9 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
   const [copied, setCopied] = useState(false);
   const hasTracked = useRef(false);
 
-  // Efeito para salvar os dados automaticamente no Dashboard ao chegar na página
+  // 1. Salvamento automático do lead ao carregar a página
   useEffect(() => {
     if (!hasTracked.current && leadData) {
-      console.log("[PixDisplay] Iniciando salvamento automático...");
       trackLead({
         full_name: leadData.nome,
         email: leadData.email,
@@ -51,18 +52,60 @@ const PixPaymentDisplay: React.FC<PixPaymentDisplayProps> = ({
     }
   }, [leadData, amount]);
 
-  // Limpa a string base64 de espaços em branco ou quebras de linha
-  const cleanBase64 = paymentCodeBase64?.replace(/\s/g, '') || '';
-  const qrCodeSrc = cleanBase64.startsWith('data:image') 
-    ? cleanBase64 
-    : `data:image/png;base64,${cleanBase64}`;
+  // 2. Verificação Automática (Polling) de status de pagamento
+  useEffect(() => {
+    const currentLeadId = sessionStorage.getItem('current_lead_id');
+    if (!currentLeadId) return;
 
+    // Função que checa o status no banco
+    const checkPaymentStatus = async () => {
+      const { data, error } = await supabase
+        .from('leads')
+        .select('status')
+        .eq('id', currentLeadId)
+        .single();
+
+      if (!error && data?.status === 'pagou') {
+        if (onSuccess) onSuccess();
+      }
+    };
+
+    // Intervalo de checagem a cada 5 segundos
+    const interval = setInterval(checkPaymentStatus, 5000);
+    
+    // Inscrição em tempo real como reforço
+    const channel = supabase
+      .channel('pix-status-check')
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'leads',
+        filter: `id=eq.${currentLeadId}`
+      }, (payload) => {
+        if (payload.new.status === 'pagou') {
+          if (onSuccess) onSuccess();
+        }
+      })
+      .subscribe();
+
+    return () => {
+      clearInterval(interval);
+      supabase.removeChannel(channel);
+    };
+  }, [onSuccess]);
+
+  // 3. Timer regressivo
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const cleanBase64 = paymentCodeBase64?.replace(/\s/g, '') || '';
+  const qrCodeSrc = cleanBase64.startsWith('data:image') 
+    ? cleanBase64 
+    : `data:image/png;base64,${cleanBase64}`;
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
