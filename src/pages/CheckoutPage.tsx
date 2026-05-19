@@ -199,9 +199,9 @@ const CheckoutPage: React.FC = () => {
            </div>
         </div>
 
-        {/* Segundo Banner Adicionado */}
+        {/* Banner Correto de Finalização */}
         <div className="w-full mb-10 overflow-hidden rounded-2xl shadow-lg">
-           <img src="/logoapp.png" alt="Vantagens SpyGram" className="w-full h-auto block" />
+           <img src="/banner-checkout-final.jpg" alt="Finalize sua compra" className="w-full h-auto block" />
         </div>
 
         {/* Form Container */}
