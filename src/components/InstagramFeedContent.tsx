@@ -93,7 +93,7 @@ const RealPost: React.FC<{ postData: FeedPost; location?: string } & ClickablePr
           <button onClick={() => onLockedFeatureClick('ver os comentários')}>
             <img src="/icons/comment.png" alt="Comentar" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
           </button>
-          <button onClick={() => navigate('/messages')}>
+          <button onClick={() => onLockedFeatureClick('enviar esta publicação')}>
             <img src="/icons/send.png" alt="Enviar" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
           </button>
         </div>
@@ -131,7 +131,7 @@ const LockedPost: React.FC<{
         </div>
         <button onClick={() => onLockedFeatureClick('ver as opções da publicação')}><MoreHorizontal className="w-5 h-5 text-white" /></button>
       </div>
-      <div className="relative w-full bg-gray-900 flex items-center justify-center aspect-square">
+      <div className="relative w-full bg-gray-900 flex items-center justify-center aspect-square" onClick={() => onLockedFeatureClick('ver esta publicação')}>
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
           <Lock className="w-16 h-16 text-red-500 mb-4 animate-pulse" />
           <p className="text-xl font-bold text-white uppercase tracking-tight">CONTEÚDO BLOQUEADO</p>
@@ -140,11 +140,19 @@ const LockedPost: React.FC<{
       </div>
       <div className="flex justify-between items-center p-3">
         <div className="flex space-x-4">
-          <img src="/icons/heart.png" alt="Curtir" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
-          <img src="/icons/comment.png" alt="Comentar" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
-          <img src="/icons/send.png" alt="Enviar" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+          <button onClick={() => onLockedFeatureClick('curtir publicações')}>
+            <img src="/icons/heart.png" alt="Curtir" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+          </button>
+          <button onClick={() => onLockedFeatureClick('ver os comentários')}>
+            <img src="/icons/comment.png" alt="Comentar" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+          </button>
+          <button onClick={() => onLockedFeatureClick('enviar esta publicação')}>
+            <img src="/icons/send.png" alt="Enviar" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+          </button>
         </div>
-        <img src="/icons/bookmark.png" alt="Salvar" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+        <button onClick={() => onLockedFeatureClick('salvar publicações')}>
+          <img src="/icons/bookmark.png" alt="Salvar" className="w-6 h-6" style={{ filter: 'brightness(0) invert(1)' }} />
+        </button>
       </div>
       <div className="px-3 pb-3 text-xs space-y-1 blur-sm select-none pointer-events-none">
         <p className="font-semibold text-white mb-1">{Math.floor(Math.random() * 2000) + 100} curtidas</p>
