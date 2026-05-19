@@ -60,27 +60,27 @@ const MessagesPage: React.FC = () => {
       }));
       setStories(suggestedStories);
 
-      // Lista expandida e embaralhada de mensagens de curiosidade
+      // Lista de mensagens "picantes" e informativas como na imagem
       const messagePreviews = [
+        '4 novas mensagens',
         'Vem aqui logo, tô sozinha... 😈',
         'Não conta pra ninguém o que a gente fez',
+        '4 novas mensagens',
         'Precisamos conversar sobre ontem 😬',
         'Enviou um anexo',
-        'Visto',
-        'Respondeu ao seu story',
-        'Enviou uma mensagem de áudio',
+        '4 novas mensagens',
         'Foto temporária',
         'Curtiu uma mensagem',
         'Onde você está??',
-        'Posso te ligar agora?',
+        '4 novas mensagens',
         'Isso é verdade?? 😱',
         'Mencionei você no meu close friends'
-      ].sort(() => 0.5 - Math.random()); // Embaralha as mensagens a cada renderização da página
+      ].sort(() => 0.5 - Math.random());
 
       const suggestedMessages: Message[] = suggestedProfiles.slice(0, 10).map((profile: SuggestedProfile, index: number) => {
         const preview = messagePreviews[index % messagePreviews.length];
         const time = ['22 h', '3 d', '4 d', '1 sem'][index % 4];
-        const unread = index % 3 === 0;
+        const unread = index % 3 === 0 || preview === '4 novas mensagens';
 
         return {
           id: profile.username,
