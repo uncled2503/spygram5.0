@@ -24,35 +24,47 @@ const InvasionSimulationPage: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn, login } = useAuth();
 
+  // Tenta recuperar dados da sessão imediatamente para evitar estado de 'loading' desnecessário
+  const storedInvasionData = useMemo(() => {
+    const data = sessionStorage.getItem('invasionData');
+    return data ? JSON.parse(data) : null;
+  }, []);
+
   // Gerar mockups iniciais para evitar tela vazia
   const initialMockups = useMemo(() => {
+    if (storedInvasionData?.suggestedProfiles?.length > 0) return storedInvasionData.suggestedProfiles;
     const shuffledNames = [...MOCK_SUGGESTION_NAMES].sort(() => 0.5 - Math.random());
-    return shuffledNames.slice(0, 15).map((name) => ({
+    return shuffledNames.slice(0, 15).map((name: string) => ({
       username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
       fullName: name,
       profile_pic_url: '/perfil.jpg', 
     }));
-  }, []);
+  }, [storedInvasionData]);
 
-  const [profileData, setProfileData] = useState<ProfileData | undefined>();
+  const [profileData, setProfileData] = useState<ProfileData | undefined>(storedInvasionData?.profileData || location.state?.profileData);
   const [suggestedProfiles, setSuggestedProfiles] = useState<SuggestedProfile[]>(initialMockups);
-  const [posts, setPosts] = useState<FeedPost[]>([]);
+  const [posts, setPosts] = useState<FeedPost[]>(storedInvasionData?.posts || []);
 
-  const [stage, setStage] = useState<SimulationStage>('loading');
+  // Inicia direto no feed se já estiver logado e tiver os dados
+  const [stage, setStage] = useState<SimulationStage>(
+    isLoggedIn && (storedInvasionData || location.state?.profileData) ? 'feed_locked' : 'loading'
+  );
+  
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [locations, setLocations] = useState<string[]>([]);
+  const [locations, setLocations] = useState<string[]>(storedInvasionData?.locations || []);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalFeatureName, setModalFeatureName] = useState('');
   
   useEffect(() => {
+    // Se já estiver no feed, não precisamos rodar a lógica de carregamento/animação
+    if (stage === 'feed_locked') return;
+
     const loadAllDataAndProceed = async () => {
-      const storedData = sessionStorage.getItem('invasionData');
-      
       let dataFromNav;
       if (location.state?.profileData) {
         dataFromNav = location.state;
       } else {
-        dataFromNav = storedData ? JSON.parse(storedData) : null;
+        dataFromNav = storedInvasionData;
       }
 
       if (!dataFromNav?.profileData) {
@@ -110,7 +122,10 @@ const InvasionSimulationPage: React.FC = () => {
 
       startBackgroundLoading();
 
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Só aplica o atraso artificial se NÃO estiver logado (primeira vez)
+      if (!isLoggedIn) {
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
 
       if (!sessionStorage.getItem('invasionEndTime')) {
         const endTime = Date.now() + 90 * 1000;
@@ -127,7 +142,7 @@ const InvasionSimulationPage: React.FC = () => {
     if (stage === 'loading') {
       loadAllDataAndProceed();
     }
-  }, [location.state, navigate, stage, isLoggedIn, suggestedProfiles]);
+  }, [location.state, navigate, stage, isLoggedIn, suggestedProfiles, storedInvasionData]);
 
   const handleLoginSuccess = useCallback(() => {
     login();
