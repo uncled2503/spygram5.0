@@ -240,6 +240,13 @@ const CreditsPage: React.FC = () => {
                     className={`relative bg-white/5 border-[1.5px] rounded-[2.5rem] p-8 flex flex-col transition-all duration-300 cursor-pointer group
                       ${pkg.highlight ? 'border-[#3b82f6] bg-white/[0.08] shadow-[0_0_30px_rgba(59,130,246,0.1)]' : 'border-white/5 hover:border-white/20'}`}
                   >
+                    {/* Badge de Melhor Custo Benefício */}
+                    {pkg.highlight && (
+                      <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#3b82f6] text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-xl shadow-blue-600/40 z-20">
+                        Melhor Custo Benefício
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between mb-6">
                        <div className="flex items-center gap-4">
                           <div className={`p-3 rounded-2xl ${pkg.highlight ? 'bg-blue-500/20 text-blue-500' : 'bg-white/5 text-gray-500'}`}>
