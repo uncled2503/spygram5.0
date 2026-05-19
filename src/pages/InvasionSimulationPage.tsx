@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import type { ProfileData, SuggestedProfile, FeedPost } from '../../types';
 import InstagramLoginSimulator from '../components/InstagramLoginSimulator';
 import InvasionSuccessCard from '../components/InvasionSuccessCard';
-import Loader from '../components/Loader';
 import ErrorMessage from '../components/ErrorMessage';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -156,9 +155,7 @@ const InvasionSimulationPage: React.FC = () => {
       );
     }
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader />
-      </div>
+      <div className="min-h-screen bg-black" />
     );
   }
 
