@@ -1,9 +1,18 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/src/context/AuthContext';
 
 const WhatsAppButton: React.FC = () => {
-  const { isLoggedIn } = useAuth();
+  let isLoggedIn = false;
+  
+  // Try-catch de segurança para garantir que o componente nunca quebre a renderização do app
+  try {
+    const auth = useAuth();
+    isLoggedIn = auth.isLoggedIn;
+  } catch (error) {
+    isLoggedIn = false;
+  }
+
   const phoneNumber = "5532987182071";
   
   // Define a mensagem com base no status de login (que representa a compra no fluxo do app)

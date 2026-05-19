@@ -27,7 +27,7 @@ import BackgroundLayout from './src/components/BackgroundLayout';
 import InvasionCounter from '@/src/components/InvasionCounter';
 import { getUserLocation } from './src/services/geolocationService';
 import { trackLead } from './src/services/trackingService';
-import WhatsAppButton from './src/components/WhatsAppButton'; // Importa o novo botão
+import WhatsAppButton from '@/src/components/WhatsAppButton'; // Import corrigido com alias global @
 
 const MainAppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -169,7 +169,7 @@ const App: React.FC = () => {
           <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
           <Route path="/chat/:id" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
         </Routes>
-        <WhatsAppButton /> {/* O botão agora aparece em todas as rotas dentro do Provider */}
+        <WhatsAppButton />
       </AuthProvider>
     </Router>
   );
