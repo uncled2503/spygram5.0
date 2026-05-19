@@ -5,6 +5,7 @@ import SalesNotification from '../components/SalesNotification';
 import PixPaymentDisplay from '../components/PixPaymentDisplay';
 import CheckoutHero from '../components/CheckoutHero';
 import CheckoutSidebar from '../components/CheckoutSidebar';
+import CheckoutSummaryMobile from '../components/CheckoutSummaryMobile';
 import PaymentSuccessDisplay from '../components/PaymentSuccessDisplay';
 import { supabase } from '../integrations/supabase/client';
 import toast from 'react-hot-toast';
@@ -263,14 +264,8 @@ const CheckoutPage: React.FC = () => {
              <img src="/banner-checkout-final.jpg" alt="Finalize sua compra" className="w-full h-auto block" />
           </div>
 
-          {/* Adquirindo Card (Mobile only, no desktop ele está no Sidebar) */}
-          <div className="w-full bg-white/60 rounded-2xl p-5 flex items-center gap-5 mb-10 border border-gray-200/50 shadow-sm md:hidden">
-             <div className="p-3 bg-white rounded-xl shadow-sm"><ShoppingCart size={22} className="text-[#78cc6d]" /></div>
-             <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Você está adquirindo:</span>
-                <span className="text-sm font-black text-gray-800">Relatório SpyGram Completo</span>
-             </div>
-          </div>
+          {/* Resumo da Compra Mobile (Substituiu o card simples) */}
+          <CheckoutSummaryMobile total={total} />
 
           {/* Form Grid Desktop */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
