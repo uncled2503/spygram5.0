@@ -189,12 +189,40 @@ const CheckoutPage: React.FC = () => {
         {/* Banner principal */}
         <img src="/banner-topo.png" alt="Banner" className="w-full h-auto mb-6 rounded-2xl shadow-lg" />
 
-        {/* Adquirindo Card - AGORA ABAIXO DO BANNER */}
-        <div className="w-full bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 mb-8 border border-gray-100">
-           <div className="p-2 bg-gray-50 rounded-lg"><ShoppingCart size={20} className="text-gray-400" /></div>
+        {/* Seção de Prova Social Mesclada (Sem contêiner) */}
+        <div className="w-full py-8 flex flex-col items-center text-center">
+           <img src="/embaixodobanner.png" alt="Testemunhos" className="w-full max-w-[320px] h-auto mb-6" />
+           
+           <h2 className="text-2xl font-black text-gray-800 mb-3 leading-tight tracking-tighter">
+             +12,3mil pessoas utilizam<br/>e aprovam o SpyGram®.
+           </h2>
+           
+           <p className="text-[12px] text-gray-500 max-w-[320px] mb-8 font-medium leading-relaxed">
+             Este aplicativo foi testado e aprovado por profissionais, contando com o selo de confiança 'Google Reviews'.
+           </p>
+           
+           {/* Google Reviews Mesclado */}
+           <div className="flex items-center gap-4 py-4 px-6 rounded-3xl bg-white/40 border border-gray-200/50 shadow-sm">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Logo.svg" alt="Google" className="h-6" />
+              <div className="flex flex-col items-start">
+                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Google Reviews:</span>
+                 <span className="text-sm font-black text-gray-800">(12,3mil) Avaliações</span>
+              </div>
+              <div className="flex items-center gap-0.5 ml-2">
+                 {[...Array(5)].map((_, i) => (
+                   <svg key={i} className="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                 ))}
+                 <span className="text-[11px] font-black text-gray-500 ml-1">(4,9)</span>
+              </div>
+           </div>
+        </div>
+
+        {/* Adquirindo Card - Mesclado */}
+        <div className="w-full bg-white/60 rounded-2xl p-5 flex items-center gap-5 mb-10 border border-gray-200/50 shadow-sm">
+           <div className="p-3 bg-white rounded-xl shadow-sm"><ShoppingCart size={22} className="text-[#78cc6d]" /></div>
            <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase text-gray-400">Você está adquirindo:</span>
-              <span className="text-xs font-bold">Relatório SpyGram Completo</span>
+              <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Você está adquirindo:</span>
+              <span className="text-sm font-black text-gray-800">Relatório SpyGram Completo</span>
            </div>
         </div>
 
@@ -315,7 +343,7 @@ const CheckoutPage: React.FC = () => {
                 <h3 className="font-black text-gray-400 uppercase tracking-widest text-xs">Resumo da Compra</h3>
              </div>
              <div className="p-8 flex flex-col items-center">
-                <img src="/spygram_transparentebranco.png" className="h-24 brightness-0 opacity-80 mb-8" alt="SpyGram Logo" />
+                <img src="/spygram_transparentebranco.png" className="h-28 brightness-0 opacity-80 mb-8" alt="SpyGram Logo" />
                 <div className="w-full border-t border-gray-100 pt-6">
                    <div className="flex justify-between items-center mb-4">
                       <div className="flex flex-col">
