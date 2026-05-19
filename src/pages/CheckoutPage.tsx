@@ -183,11 +183,13 @@ const CheckoutPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto px-4 py-6 flex flex-col items-center">
-        
-        {/* Banner principal */}
-        <img src="/banner-topo.png" alt="Banner" className="w-full h-auto mb-6 rounded-2xl shadow-lg" />
+      {/* Banner Principal como Hero */}
+      <div className="w-full overflow-hidden shadow-lg mb-6">
+        <img src="/banner-topo.png" alt="Banner" className="w-full h-auto block" />
+      </div>
 
+      <div className="max-w-xl mx-auto px-4 flex flex-col items-center">
+        
         {/* Adquirindo Card - Mesclado */}
         <div className="w-full bg-white/60 rounded-2xl p-5 flex items-center gap-5 mb-10 border border-gray-200/50 shadow-sm">
            <div className="p-3 bg-white rounded-xl shadow-sm"><ShoppingCart size={22} className="text-[#78cc6d]" /></div>
