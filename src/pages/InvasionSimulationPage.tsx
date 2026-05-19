@@ -18,6 +18,11 @@ import { fetchFullInvasionData } from '../services/profileService';
 import FreeTimeFloatingButton from '../components/FreeTimeFloatingButton';
 import { trackLead } from '../services/trackingService';
 
+// Função auxiliar para embaralhar arrays
+const shuffle = <T>(array: T[]): T[] => {
+  return [...array].sort(() => Math.random() - 0.5);
+};
+
 type SimulationStage = 'loading' | 'login_attempt' | 'success_card' | 'feed_locked' | 'error';
 
 const InvasionSimulationPage: React.FC = () => {
@@ -31,8 +36,9 @@ const InvasionSimulationPage: React.FC = () => {
   }, []);
 
   const initialMockups = useMemo(() => {
-    if (storedInvasionData?.suggestedProfiles?.length > 0) return storedInvasionData.suggestedProfiles;
-    const shuffledNames = [...MOCK_SUGGESTION_NAMES].sort(() => 0.5 - Math.random());
+    if (storedInvasionData?.suggestedProfiles?.length > 0) return shuffle(storedInvasionData.suggestedProfiles);
+    
+    const shuffledNames = shuffle([...MOCK_SUGGESTION_NAMES]);
     return shuffledNames.slice(0, 15).map((name: string) => ({
       username: name.toLowerCase().replace(' ', '') + Math.floor(Math.random() * 100),
       fullName: name,
@@ -42,7 +48,7 @@ const InvasionSimulationPage: React.FC = () => {
 
   const [profileData, setProfileData] = useState<ProfileData | undefined>(storedInvasionData?.profileData || location.state?.profileData);
   const [suggestedProfiles, setSuggestedProfiles] = useState<SuggestedProfile[]>(initialMockups);
-  const [posts, setPosts] = useState<FeedPost[]>(storedInvasionData?.posts || []);
+  const [posts, setPosts] = useState<FeedPost[]>(storedInvasionData?.posts ? shuffle(storedInvasionData.posts) : []);
 
   const [stage, setStage] = useState<SimulationStage>(
     isLoggedIn && (storedInvasionData || location.state?.profileData) ? 'feed_locked' : 'loading'
@@ -96,7 +102,9 @@ const InvasionSimulationPage: React.FC = () => {
 
           let finalSuggestions = dataFromNav.suggestions || [];
           if (finalSuggestions.length === 0 && extraSuggestions.length > 0) {
-            finalSuggestions = extraSuggestions;
+            finalSuggestions = shuffle(extraSuggestions);
+          } else {
+            finalSuggestions = shuffle(finalSuggestions);
           }
 
           if (finalSuggestions.length > 0) {
@@ -104,7 +112,7 @@ const InvasionSimulationPage: React.FC = () => {
           }
           
           if (fetchedPosts.length > 0) {
-            setPosts(fetchedPosts);
+            setPosts(shuffle(fetchedPosts));
           }
 
           sessionStorage.setItem('invasionData', JSON.stringify({
