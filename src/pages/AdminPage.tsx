@@ -48,7 +48,7 @@ const AdminPage: React.FC = () => {
       if (silent) toast.success('Dados atualizados!');
     } catch (error: any) {
       console.error('Erro ao buscar leads:', error);
-      toast.error('Erro ao carregar dados: ' + (error.message || ''));
+      toast.error('Erro ao carregar dados');
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,6 @@ const AdminPage: React.FC = () => {
     const toastId = toast.loading(`Excluindo @${username}...`);
 
     try {
-      // Chamamos a Edge Function administrativa para garantir a exclusão
       const { data, error } = await supabase.functions.invoke('delete-lead', {
         body: { leadId: id },
       });
@@ -89,8 +88,7 @@ const AdminPage: React.FC = () => {
       toast.success(`Lead @${username} removido com sucesso.`, { id: toastId });
       setLeads(prev => prev.filter(l => l.id !== id));
     } catch (error: any) {
-      console.error('Erro ao deletar lead:', error);
-      toast.error('Falha na exclusão: ' + error.message, { id: toastId });
+      toast.error('Falha na exclusão', { id: toastId });
     }
   };
 
@@ -118,7 +116,7 @@ const AdminPage: React.FC = () => {
         toast.success(`Acesso liberado para ${email}!`);
       }
     } catch (err: any) {
-      toast.error('Erro ao liberar acesso: ' + err.message);
+      toast.error('Erro ao liberar acesso');
     }
   };
 
@@ -145,7 +143,7 @@ const AdminPage: React.FC = () => {
     return {
       total,
       paidCount: paid.length,
-      pixCount: pixGenerated.length,
+      pixCount: pixCount = pixGenerated.length,
       checkoutCount: checkouts.length,
       revenue,
       conversion: total > 0 ? (paid.length / total) * 100 : 0
@@ -246,8 +244,8 @@ const AdminPage: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <img src={lead.profile_pic || '/perfil.jpg'} className="w-10 h-10 rounded-xl object-cover border border-white/5" />
                       <div>
-                        <p className="text-sm font-bold text-white">@{lead.username_searched}</p>
-                        <p className="text-[10px] text-gray-500">{lead.city || 'Desconhecido'}</p>
+                        <p className="text-sm font-bold text-white">@{lead.username_searched || '---'}</p>
+                        <p className="text-[10px] text-gray-500 uppercase font-black">{lead.city || 'Desconhecido'}</p>
                       </div>
                     </div>
                   </td>
@@ -263,6 +261,7 @@ const AdminPage: React.FC = () => {
                     }`}>
                       {lead.status}
                     </span>
+                    {lead.total_amount > 0 && <p className="text-[10px] font-black mt-1 text-white">R$ {Number(lead.total_amount).toFixed(2)}</p>}
                   </td>
                   <td className="py-5 px-4">
                     <div className="flex items-center justify-center gap-2">

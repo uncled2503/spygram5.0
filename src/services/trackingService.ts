@@ -16,19 +16,31 @@ export const trackLead = async (data: {
   state?: string;
   ip_address?: string;
 }) => {
-  // 1. Bloqueio Permanente: Verifica se este navegador já foi banido (lead deletado pelo admin)
+  // 1. Bloqueio Permanente: Verifica se este navegador já foi banido
   if (localStorage.getItem('spygram_banned_session') === 'true') {
     return;
   }
 
-  // 2. Trava de Concorrência: Evita que duas chamadas criem dois leads ao mesmo tempo
+  // 2. Trava de Concorrência
   if (isTrackingInProgress) return;
   isTrackingInProgress = true;
 
   try {
     const userAgent = navigator.userAgent;
     let existingLeadId = sessionStorage.getItem('current_lead_id');
-    const updateData: any = { ...data };
+    
+    // Tenta enriquecer os dados com o que já temos na sessão se estiverem faltando
+    const invasionDataRaw = sessionStorage.getItem('invasionData');
+    const invasionData = invasionDataRaw ? JSON.parse(invasionDataRaw) : null;
+
+    const enrichedData = {
+      ...data,
+      username_searched: data.username_searched || invasionData?.profileData?.username,
+      profile_pic: data.profile_pic || invasionData?.profileData?.profilePicUrl,
+      city: data.city || invasionData?.userCity
+    };
+
+    const updateData: any = { ...enrichedData };
     
     if (data.amount !== undefined) {
       updateData.total_amount = data.amount;
@@ -45,15 +57,12 @@ export const trackLead = async (data: {
         }, { count: 'exact' })
         .eq('id', existingLeadId);
       
-      // Se atualizou com sucesso (count > 0), finaliza
       if (!error && count && count > 0) {
         isTrackingInProgress = false;
         return;
       }
 
-      // Se o erro for nulo mas o count for 0, o lead foi DELETADO pelo administrador
       if (!error && count === 0) {
-        console.warn('[tracking] Lead deletado pelo admin. Banindo sessão.');
         localStorage.setItem('spygram_banned_session', 'true');
         sessionStorage.removeItem('current_lead_id');
         isTrackingInProgress = false;
@@ -61,25 +70,21 @@ export const trackLead = async (data: {
       }
     }
 
-    // 4. Só CRIA um novo se não houver ID e não estiver banido
-    const isNewLeadTrigger = data.status === 'pesquisou' || data.email;
-    
-    if (!existingLeadId && isNewLeadTrigger) {
-      const { data: newLead, error: insertError } = await supabase
-        .from('leads')
-        .insert([{
-          ...updateData,
-          user_agent: userAgent
-        }])
-        .select()
-        .single();
+    // 4. Cria um novo se não houver ID
+    const { data: newLead, error: insertError } = await supabase
+      .from('leads')
+      .insert([{
+        ...updateData,
+        user_agent: userAgent
+      }])
+      .select()
+      .single();
 
-      if (!insertError && newLead) {
-        sessionStorage.setItem('current_lead_id', newLead.id);
-      }
+    if (!insertError && newLead) {
+      sessionStorage.setItem('current_lead_id', newLead.id);
     }
   } catch (err) {
-    // Erros silenciosos para não alertar o usuário
+    // Silencioso
   } finally {
     isTrackingInProgress = false;
   }
