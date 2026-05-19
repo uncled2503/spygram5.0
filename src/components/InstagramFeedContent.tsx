@@ -112,25 +112,31 @@ const RealPost: React.FC<{ postData: FeedPost; location?: string } & ClickablePr
   );
 };
 
-// Post bloqueado restaurado para usar a div e fundo cinza
-const LockedPost: React.FC<{ location?: string }> = ({ location }) => {
+// Post bloqueado agora aceita dados reais para o cabeçalho
+const LockedPost: React.FC<{ 
+  username: string; 
+  profilePicUrl: string; 
+  location?: string;
+  onLockedFeatureClick: (featureName: string) => void;
+}> = ({ username, profilePicUrl, location, onLockedFeatureClick }) => {
+  const maskedUsername = maskUsername(username);
   return (
     <div className="border-b border-gray-800 mb-4">
       <div className="flex items-center justify-between p-3">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-full bg-gray-700"></div>
+        <div onClick={() => onLockedFeatureClick(`ver o perfil de @${username}`)} className="flex items-center space-x-3 cursor-pointer">
+          <img src={profilePicUrl} alt={username} className="w-8 h-8 rounded-full object-cover border border-gray-800" />
           <div>
-            <p className="text-sm font-semibold text-white bg-gray-700 rounded w-20 h-4"></p>
-            {location && <p className="text-xs text-gray-400 mt-1">{location}</p>}
+            <p className="text-sm font-semibold text-white">{maskedUsername}</p>
+            {location && <p className="text-xs text-gray-400">{location}</p>}
           </div>
         </div>
-        <MoreHorizontal className="w-5 h-5 text-white" />
+        <button onClick={() => onLockedFeatureClick('ver as opções da publicação')}><MoreHorizontal className="w-5 h-5 text-white" /></button>
       </div>
       <div className="relative w-full bg-gray-900 flex items-center justify-center aspect-square">
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
           <Lock className="w-16 h-16 text-red-500 mb-4 animate-pulse" />
-          <p className="text-xl font-bold text-white">CONTEÚDO BLOQUEADO</p>
-          <p className="text-sm text-gray-400 mt-1">Acesso Premium Requerido</p>
+          <p className="text-xl font-bold text-white uppercase tracking-tight">CONTEÚDO BLOQUEADO</p>
+          <p className="text-[11px] text-gray-400 mt-1 uppercase font-black tracking-widest">Acesso Premium Requerido</p>
         </div>
       </div>
       <div className="flex justify-between items-center p-3">
@@ -143,7 +149,7 @@ const LockedPost: React.FC<{ location?: string }> = ({ location }) => {
       </div>
       <div className="px-3 pb-3 text-xs space-y-1 blur-sm select-none pointer-events-none">
         <p className="font-semibold text-white mb-1">{Math.floor(Math.random() * 2000) + 100} curtidas</p>
-        <p className="text-white"><span className="font-semibold mr-1">username</span><span>Lorem ipsum dolor sit amet, consectetur...</span></p>
+        <p className="text-white"><span className="font-semibold mr-1">{maskedUsername}</span><span>Lorem ipsum dolor sit amet, consectetur...</span></p>
         <p className="text-gray-500 mt-1">Ver todos os {Math.floor(Math.random() * 50) + 10} comentários</p>
       </div>
     </div>
@@ -194,10 +200,13 @@ const InstagramFeedContent: React.FC<InstagramFeedContentProps> = ({ profileData
         
         {hasRealPosts ? posts.map((post, index) => (
           <RealPost key={post.post.id || index} postData={post} location={locations.length > 0 ? locations[index % locations.length] : undefined} onLockedFeatureClick={onLockedFeatureClick} />
-        )) : [1, 2, 3].map((item, index) => (
+        )) : suggestedProfiles.slice(0, 5).map((profile, index) => (
           <LockedPost 
-            key={item} 
+            key={profile.username || index} 
+            username={profile.username}
+            profilePicUrl={profile.profile_pic_url}
             location={locations.length > 0 ? locations[index % locations.length] : undefined} 
+            onLockedFeatureClick={onLockedFeatureClick}
           />
         ))}
 
