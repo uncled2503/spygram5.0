@@ -10,9 +10,9 @@ const SalesNotification: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Inicializa o áudio com um novo som de notificação (Sucess/Chime)
-    audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
-    audioRef.current.volume = 0.4;
+    // Som de "Ding" de sucesso moderno
+    audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+    audioRef.current.volume = 0.5;
 
     const showRandomNotification = () => {
       const name = NAMES[Math.floor(Math.random() * NAMES.length)];
@@ -21,9 +21,9 @@ const SalesNotification: React.FC = () => {
       
       // Toca o som de venda
       if (audioRef.current) {
+        audioRef.current.currentTime = 0; // Reinicia o áudio para garantir que toque sempre do início
         audioRef.current.play().catch(() => {
-          // Navegadores bloqueiam autoplay sem interação prévia
-          console.log("Som bloqueado pelo navegador. Interaja com a página primeiro.");
+          console.log("Interaja com a página para habilitar o som.");
         });
       }
 
