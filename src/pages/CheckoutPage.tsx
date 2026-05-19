@@ -97,7 +97,7 @@ const CheckoutPage: React.FC = () => {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
-  const basePrice = 37.00; // Valor original restaurado
+  const basePrice = 37.00; 
   const bumpDetails = {
     pro: { title: 'ACESSO VITALÍCIO PRO', price: 9.90, img: '/order-bumps/vitalicio.jpg', desc: 'Tenha acesso permanente a ferramenta SpyGram PRO!', checkText: 'ADQUIRIR TAMBÉM ACESSO VITALÍCIO AO SPYGRAM PRO ✅ À VISTA POR R$ 9,90' },
     social: { title: 'ESPIÃO SOCIAL COMPLETO', price: 19.90, img: '/order-bumps/social.jpg', desc: 'Tenha acesso a todas as redes sociais de quem você quiser!', checkText: 'ADQUIRIR TAMBÉM ESPIÃO INSTAGRAM + FACEBOOK + WHATSAPP À VISTA POR R$ 19,90' },
@@ -191,7 +191,6 @@ const CheckoutPage: React.FC = () => {
     setBumps(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Se o pagamento for confirmado, mostra a tela de sucesso
   if (paymentConfirmed) {
     return (
       <div className="min-h-screen bg-[#f4f4f4] py-12 px-4 flex items-center justify-center">
@@ -210,7 +209,6 @@ const CheckoutPage: React.FC = () => {
           amount={pixData.amount}
           leadData={pixData.leadInfo}
           onConfirm={() => {
-            // Verifica manualmente o status ao clicar
             const checkStatus = async () => {
               const leadId = sessionStorage.getItem('current_lead_id');
               const { data } = await supabase.from('leads').select('status').eq('id', leadId).single();
@@ -231,7 +229,6 @@ const CheckoutPage: React.FC = () => {
     <div className="min-h-screen bg-[#f4f4f4] text-[#333] font-sans pb-20">
       <SalesNotification />
       
-      {/* Timer Header */}
       <div className="w-full bg-[#f15c5c] text-white py-3 px-4 flex flex-col items-center justify-center sticky top-0 z-50 shadow-md">
         <span className="text-[14px] font-black uppercase mb-1">{formatTimer(timeLeft)}</span>
         <div className="flex items-center gap-2">
@@ -240,33 +237,23 @@ const CheckoutPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Desktop Section */}
       <CheckoutHero />
 
-      {/* Banner Principal como Hero (Mobile only) */}
       <div className="w-full overflow-hidden shadow-lg mb-6 md:hidden relative flex items-center justify-center">
-        {/* Camada de fundo com zoom e blur */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center scale-[1.35] blur-[15px] opacity-70"
           style={{ backgroundImage: 'url(/banner-topo.png)' }}
         />
-        {/* Banner principal */}
         <img src="/banner-topo.png" alt="Banner" className="relative z-10 w-full h-auto block" />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 flex flex-col lg:flex-row gap-10 items-start">
-        
-        {/* Main Content Area */}
         <div className="flex-1 w-full space-y-8">
-          
-          {/* Banner Promo Desktop / Mobile */}
           <div className="w-full mb-6 overflow-hidden rounded-2xl shadow-lg">
              <img src="/banner-checkout-final.jpg" alt="Finalize sua compra" className="w-full h-auto block" />
           </div>
 
-          {/* Form Grid Desktop */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Section 1: Dados Pessoais */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-fit">
               <div className="bg-gray-200/50 p-4 border-b border-gray-100 flex items-center gap-4">
                   <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-black text-sm">1</div>
@@ -296,7 +283,6 @@ const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Section 2: Pagamento */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="bg-gray-200/50 p-4 border-b border-gray-100 flex items-center gap-4">
                   <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-black text-sm">2</div>
@@ -321,7 +307,6 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Section 3: Compre Junto */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
              <div className="bg-gray-200/50 p-4 border-b border-gray-100 flex items-center gap-4">
                 <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-black text-sm">3</div>
@@ -365,16 +350,25 @@ const CheckoutPage: React.FC = () => {
              </div>
           </div>
 
-          {/* Resumo da Compra Mobile (Movido para o final da página conforme solicitado) */}
-          <CheckoutSummaryMobile total={total} />
+          {/* Resumo da Compra Mobile Atualizado */}
+          <CheckoutSummaryMobile 
+            total={total} 
+            basePrice={basePrice} 
+            selectedBumps={bumps} 
+            bumpDetails={bumpDetails} 
+          />
 
         </div>
 
-        {/* Sidebar Web */}
-        <CheckoutSidebar total={total} />
+        {/* Sidebar Web Atualizada */}
+        <CheckoutSidebar 
+          total={total} 
+          basePrice={basePrice} 
+          selectedBumps={bumps} 
+          bumpDetails={bumpDetails} 
+        />
       </div>
 
-      {/* Footer info Web/Mobile */}
       <div className="max-w-6xl mx-auto px-4 mt-16 space-y-12">
         <div className="w-full bg-white border border-gray-100 rounded-2xl py-6 px-10 flex flex-col md:flex-row justify-between items-center gap-8 shadow-sm">
            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">E-MAIL DE SUPORTE: contato@spygram.com.br</p>
