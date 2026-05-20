@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter, useNavigate } from 'react-router-dom';
 import CustomSearchBar from '@/src/components/ui/CustomSearchBar';
 import SparkleButton from '@/src/components/ui/SparkleButton';
 import ErrorMessage from '@/src/components/ErrorMessage';
@@ -134,8 +134,16 @@ const MainAppContent: React.FC = () => {
     <div className="min-h-screen bg-transparent">
       <ProgressBar progress={progressBarProgress} isVisible={isLoading} />
       <div className="relative z-20 text-white flex flex-col items-center px-4 pt-12 pb-8 w-full"> 
-        <header className="text-center mb-8 w-full max-xl">
-          <img src="/spygram_transparentebranco.png" alt="Logo" className="h-24 mx-auto mb-6" />
+        <header className="text-center mb-8 w-full max-xl flex flex-col items-center">
+          {/* Nova logo do detetive estilizada para fundo escuro */}
+          <div className="relative mb-4 group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500 rounded-full blur opacity-40 group-hover:opacity-100 transition duration-500 animate-pulse"></div>
+            <div className="relative w-24 h-24 bg-white p-3 rounded-full shadow-2xl flex items-center justify-center">
+              <img src="/detective.png" alt="Detetive SpyGram" className="w-full h-full object-contain" />
+            </div>
+          </div>
+          
+          <img src="/spygram_transparentebranco.png" alt="Logo Text" className="h-16 mx-auto mb-4" />
           <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-transparent bg-clip-text uppercase">SpyGram</h1>
           <p className="text-xl font-bold">ACESSE O <span className="text-pink-500">INSTAGRAM</span> DE QUALQUER PESSOA <span className="text-yellow-500">SEM SENHA</span></p>
         </header>
@@ -152,26 +160,60 @@ const MainAppContent: React.FC = () => {
   );
 };
 
+// Configurando o roteamento baseado em objeto do React Router v7
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <BackgroundLayout><MainAppContent /></BackgroundLayout>,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/admin-login",
+    element: <AdminLoginPage />,
+  },
+  {
+    path: "/checkout",
+    element: <CheckoutPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminProtectedRoute><AdminPage /></AdminProtectedRoute>,
+  },
+  {
+    path: "/instagram",
+    element: <InvasionSimulationPage />,
+  },
+  {
+    path: "/invasion-concluded",
+    element: <BackgroundLayout><InvasionConcludedPage /></BackgroundLayout>,
+  },
+  {
+    path: "/servers",
+    element: <ProtectedRoute><BackgroundLayout><ServersPage /></BackgroundLayout></ProtectedRoute>,
+  },
+  {
+    path: "/credits",
+    element: <ProtectedRoute><BackgroundLayout><CreditsPage /></BackgroundLayout></ProtectedRoute>,
+  },
+  {
+    path: "/messages",
+    element: <ProtectedRoute><MessagesPage /></ProtectedRoute>,
+  },
+  {
+    path: "/chat/:id",
+    element: <ProtectedRoute><ChatPage /></ProtectedRoute>,
+  }
+]);
+
 const App: React.FC = () => {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<BackgroundLayout><MainAppContent /></BackgroundLayout>} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin-login" element={<AdminLoginPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/admin" element={<AdminProtectedRoute><AdminPage /></AdminProtectedRoute>} />
-          <Route path="/instagram" element={<InvasionSimulationPage />} />
-          <Route path="/invasion-concluded" element={<BackgroundLayout><InvasionConcludedPage /></BackgroundLayout>} />
-          <Route path="/servers" element={<ProtectedRoute><BackgroundLayout><ServersPage /></BackgroundLayout></ProtectedRoute>} />
-          <Route path="/credits" element={<ProtectedRoute><BackgroundLayout><CreditsPage /></BackgroundLayout></ProtectedRoute>} />
-          <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
-          <Route path="/chat/:id" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-        </Routes>
-        <WhatsAppButton />
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <RouterProvider router={router} />
+      <WhatsAppButton />
+    </AuthProvider>
   );
 };
 
