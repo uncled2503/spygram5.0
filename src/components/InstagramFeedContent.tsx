@@ -46,7 +46,7 @@ const InstagramHeader: React.FC<ClickableProps> = ({ onLockedFeatureClick }) => 
 const InstagramFooter: React.FC<{ profileData: ProfileData } & ClickableProps> = ({ profileData, onLockedFeatureClick }) => {
   const navigate = useNavigate();
   return (
-    <footer className="flex justify-around items-center py-3 border-t border-gray-800 bg-black flex-shrink-0 md:hidden">
+    <footer className="flex justify-around items-center pt-3 pb-6 border-t border-gray-800 bg-black flex-shrink-0 md:hidden">
       <button onClick={() => onLockedFeatureClick('acessar a página inicial')}>
         <img src="/icons/home.png" alt="Página Inicial" className="w-7 h-7" style={{ filter: 'brightness(0) invert(1)' }} />
       </button>
@@ -182,11 +182,12 @@ const LockedPost: React.FC<{
   );
 };
 
-interface InstagramFeedContentProps extends ClickableProps {
+interface InstagramFeedContentProps {
   profileData: ProfileData;
   suggestedProfiles: SuggestedProfile[];
   posts: FeedPost[];
   locations: string[];
+  onLockedFeatureClick: (featureName: string) => void;
 }
 
 const InstagramFeedContent: React.FC<InstagramFeedContentProps> = ({ profileData, suggestedProfiles, posts, locations, onLockedFeatureClick }) => {
