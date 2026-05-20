@@ -1,4 +1,4 @@
-import type { ProfileData, SuggestedProfile, FetchResult, FeedPost, PostUser, Post } from '../../types';
+import type { ProfileData, SuggestedProfile, FetchResult, FeedPost } from '../../types';
 import { supabase } from '../integrations/supabase/client';
 
 // ===================================
@@ -25,26 +25,35 @@ function shuffleArray(array: any[]): any[] {
     return [...array].sort(() => Math.random() - 0.5);
 }
 
-const simpleFetch = async (campo: string, username: string): Promise<any> => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+// Lista de nomes/usuários realistas em português para simulação
+const MOCK_PEOPLE = [
+    { username: 'biel_silva', fullName: 'Gabriel Silva', pic: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=cover' },
+    { username: 'amanda.mendes', fullName: 'Amanda Mendes', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=cover' },
+    { username: 'lucas_lima', fullName: 'Lucas Lima', pic: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=cover' },
+    { username: 'carol_rezende', fullName: 'Carolina Rezende', pic: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&h=150&fit=cover' },
+    { username: 'thiagosantos', fullName: 'Thiago Santos', pic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=cover' },
+    { username: 'julia.moraes', fullName: 'Júlia Moraes', pic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=cover' },
+    { username: 'felipe.castro', fullName: 'Felipe Castro', pic: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&h=150&fit=cover' },
+    { username: 'leticia.s', fullName: 'Letícia Souza', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=cover' },
+];
 
-    try {
-        const { data, error } = await supabase.functions.invoke('proxy-api', {
-            body: { campo, username },
-        });
+const LIFESTYLE_IMAGES = [
+    'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=600&q=80',
+    'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&q=80',
+    'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&q=80',
+    'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&q=80',
+    'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&q=80',
+    'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=600&q=80',
+];
 
-        clearTimeout(timeoutId);
-
-        if (error) throw new Error(`Erro ao contatar o servidor: ${error.message}`);
-        if (data.error) throw new Error(`Erro no servidor: ${data.error}`);
-        
-        return data;
-    } catch (e) {
-        clearTimeout(timeoutId);
-        throw e;
-    }
-};
+const MOCK_CAPTIONS = [
+    "Sintonize na sua melhor versão ✨",
+    "Vivendo momentos que não têm preço 📸",
+    "Sabadou com estilo e boa companhia 🍷",
+    "Focada nos novos projetos que estão vindo por aí 🤫",
+    "Lembrança de um dia quente de verão 🏖️",
+    "Aproveitando cada segundo, a vida passa rápido demais. 🍃",
+];
 
 // ===================================
 // EXPORTED FUNCTIONS
@@ -89,8 +98,18 @@ export async function fetchProfileData(username: string): Promise<FetchResult> {
                     username: p.username,
                     profile_pic_url: getProxyImageUrlLight(p.profile_pic_url),
                     fullName: p.full_name,
-                    is_private: p.is_private === true // Explicitamente identifica se é privado
+                    is_private: p.is_private === true
                 })));
+            }
+
+            // Se a API não retornou sugestões, usamos nossa lista mockada de alta qualidade
+            if (suggestions.length === 0) {
+                suggestions = MOCK_PEOPLE.map(p => ({
+                    username: p.username,
+                    fullName: p.fullName,
+                    profile_pic_url: p.pic,
+                    is_private: false
+                }));
             }
 
             return { profile, suggestions, posts: [] };
@@ -103,67 +122,41 @@ export async function fetchProfileData(username: string): Promise<FetchResult> {
 }
 
 export async function fetchFullInvasionData(profileData: ProfileData): Promise<{ suggestions: SuggestedProfile[], posts: FeedPost[] }> {
-    const cleanUsername = profileData.username.replace(/^@+/, '').trim();
-    
     try {
-        // Busca sugestões (perfis em comum)
-        const suggestionsResponse = await simpleFetch('perfis_sugeridos', cleanUsername).catch(() => null);
+        // Gera sugestões de amigos locais altamente realistas
+        const suggestions: SuggestedProfile[] = MOCK_PEOPLE.map(p => ({
+            username: p.username,
+            fullName: p.fullName,
+            profile_pic_url: p.pic,
+            is_private: false
+        }));
 
-        let suggestions: SuggestedProfile[] = [];
-        const suggestionsData = suggestionsResponse?.results?.[0]?.data;
-        
-        if (Array.isArray(suggestionsData)) {
-            suggestions = shuffleArray(suggestionsData.map((p: any) => ({
-                username: p.username || '',
-                fullName: p.full_name || p.username,
-                profile_pic_url: getProxyImageUrlLight(p.profile_pic_url),
-                is_private: p.is_private === true,
-            })));
-        }
-
-        // FILTRO: Identifica os perfis que NÃO são privados (Abertos)
-        // Pegamos os 4 primeiros perfis abertos para buscar posts reais
-        const openProfiles = suggestions.filter(p => p.is_private === false).slice(0, 4);
-
-        const postPromises = openProfiles.map(async (profile) => {
-            try {
-                // Chama a API de posts para cada perfil aberto
-                const postsResponse = await simpleFetch('lista_posts', profile.username);
-                const postsData = postsResponse?.results?.[0]?.data;
-                
-                if (Array.isArray(postsData) && postsData.length > 0) {
-                    // Pegamos apenas o post mais recente de cada perfil para compor a timeline
-                    const item = postsData[0]; 
-                    return {
-                        de_usuario: {
-                            username: profile.username,
-                            full_name: profile.fullName || profile.username,
-                            profile_pic_url: profile.profile_pic_url,
-                        },
-                        post: {
-                            id: item.id || String(Math.random()),
-                            image_url: getProxyImageUrl(item.image_url || item.display_url),
-                            video_url: item.video_url ? getProxyImageUrl(item.video_url) : undefined,
-                            is_video: !!item.video_url || item.media_type === 2,
-                            caption: item.caption || '',
-                            like_count: item.like_count || Math.floor(Math.random() * 500) + 50,
-                            comment_count: item.comment_count || Math.floor(Math.random() * 30) + 5,
-                        }
-                    };
+        // Cria posts simulados dinâmicos e atraentes baseados nas imagens lifestyle
+        const posts: FeedPost[] = MOCK_PEOPLE.slice(0, 5).map((person, index) => {
+            const imageUrl = LIFESTYLE_IMAGES[index % LIFESTYLE_IMAGES.length];
+            const caption = MOCK_CAPTIONS[index % MOCK_CAPTIONS.length];
+            
+            return {
+                de_usuario: {
+                    username: person.username,
+                    full_name: person.fullName,
+                    profile_pic_url: person.pic,
+                },
+                post: {
+                    id: `post-simulated-${index}`,
+                    image_url: imageUrl,
+                    is_video: false,
+                    caption: caption,
+                    like_count: Math.floor(Math.random() * 1500) + 120,
+                    comment_count: Math.floor(Math.random() * 45) + 8,
                 }
-                return null;
-            } catch (error) {
-                return null;
-            }
+            };
         });
-
-        const resolvedPosts = await Promise.all(postPromises);
-        // Remove nulos e retorna a lista de posts reais encontrados
-        const posts = resolvedPosts.filter((p): p is FeedPost => p !== null);
 
         return { suggestions, posts };
 
     } catch (error) {
+        console.error('❌ Erro no fetchFullInvasionData:', error);
         return { suggestions: [], posts: [] };
     }
 }
