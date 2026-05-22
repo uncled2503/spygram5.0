@@ -378,7 +378,9 @@ const AdminPage: React.FC = () => {
                             <img src={lead.profile_pic || '/perfil.jpg'} className="w-12 h-12 rounded-2xl object-cover border border-white/10 shadow-lg" />
                             <div>
                               <p className="text-sm font-black text-white tracking-tight">@{lead.username_searched}</p>
-                              <p className="text-[10px] text-gray-500 font-bold">{new Date(lead.created_at).toLocaleDateString()}</p>
+                              <p className="text-[10px] text-gray-500 font-bold">
+                                {new Date(lead.created_at).toLocaleDateString('pt-BR')} - {new Date(lead.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                              </p>
                             </div>
                           </div>
                         </td>
