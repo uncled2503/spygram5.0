@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import CustomSearchBar from '@/src/components/ui/CustomSearchBar';
 import SparkleButton from '@/src/components/ui/SparkleButton';
 import ErrorMessage from '@/src/components/ErrorMessage';
@@ -31,6 +31,27 @@ import { trackLead } from './src/services/trackingService';
 import WhatsAppButton from '@/src/components/WhatsAppButton';
 import AnalyticsTracker from '@/src/components/AnalyticsTracker';
 import { trackFacebookEvent } from './src/services/facebookService';
+
+// Componente Guardião para prender o visitante na página de vendas caso o período gratuito expire
+const TrialGuard: React.FC = () => {
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const isTrialExpired = localStorage.getItem('spygram_trial_expired') === 'true';
+    if (isTrialExpired && !isLoggedIn) {
+      // Rotas que o usuário de teste bloqueado tem permissão para acessar (Checkout e Login)
+      const allowedPaths = ['/invasion-concluded', '/checkout', '/login', '/admin-login', '/admin'];
+      const isAllowed = allowedPaths.some(path => location.pathname.startsWith(path));
+      if (!isAllowed) {
+        navigate('/invasion-concluded', { replace: true });
+      }
+    }
+  }, [location.pathname, isLoggedIn, navigate]);
+
+  return null;
+};
 
 const MainAppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -86,6 +107,7 @@ const MainAppContent: React.FC = () => {
       sessionStorage.removeItem('invasionData');
       sessionStorage.removeItem('current_lead_id');
       localStorage.removeItem('spygram_banned_session');
+      localStorage.removeItem('spygram_trial_expired'); // Limpa trava anterior
 
       const [fetchResult, locationData] = await Promise.all([
         fetchProfileData(searchQuery.trim()),
@@ -176,6 +198,7 @@ const App: React.FC = () => {
     <Router>
       <AuthProvider>
         <AnalyticsTracker /> {/* Rastreador de Analytics Ativo */}
+        <TrialGuard /> {/* Bloqueador permanente de teste grátis expirado */}
         <Routes>
           <Route path="/" element={<BackgroundLayout><MainAppContent /></BackgroundLayout>} />
           <Route path="/login" element={<LoginPage />} />

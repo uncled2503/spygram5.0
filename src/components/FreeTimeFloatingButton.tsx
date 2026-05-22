@@ -22,6 +22,7 @@ const FreeTimeFloatingButton: React.FC = () => {
       if (remaining <= 0) {
         // Limpa o tempo de término ao concluir e redireciona
         sessionStorage.removeItem('invasionEndTime');
+        localStorage.setItem('spygram_trial_expired', 'true'); // Ativa a trava de navegação pós-teste
         navigate('/invasion-concluded');
       }
     };

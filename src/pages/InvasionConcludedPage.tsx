@@ -59,6 +59,9 @@ const InvasionConcludedPage: React.FC = () => {
       setProfileData(data.profileData);
       setUserCity(data.userCity || 'Sua Localização');
 
+      // Trava permanentemente o acesso à página concluída
+      localStorage.setItem('spygram_trial_expired', 'true');
+
       if (data.suggestedProfiles && data.suggestedProfiles.length > 0) {
         setSuggestedProfiles(data.suggestedProfiles);
       } else {
