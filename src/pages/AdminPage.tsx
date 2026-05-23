@@ -292,19 +292,44 @@ const AdminPage: React.FC = () => {
     if (!selectedLead) return;
     setAccessLoading(true);
     try {
-      // Injeta um pagamento aprovado correspondente ao valor do pacote
-      const { error } = await supabase
-        .from('payments')
-        .insert({
-          transaction_id: `MANUAL-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-          lead_id: selectedLead.id,
-          status: 'approved',
-          payload: { amount: creditAmount }
-        });
+      // Injeta os créditos chamando a nova Edge Function (Bypass de RLS)
+      const { data, error } = await supabase.functions.invoke('manage-credits', {
+        body: { 
+          leadId: selectedLead.id,
+          action: 'add',
+          amount: creditAmount
+        },
+      });
 
       if (error) throw error;
 
       toast.success("Créditos injetados com sucesso!");
+      setShowCreditsModal(false);
+      fetchLeads(true);
+    } catch (err: any) {
+      toast.error("Erro ao processar: " + err.message);
+    } finally {
+      setAccessLoading(false);
+    }
+  };
+
+  const handleRemoveCredits = async () => {
+    if (!selectedLead) return;
+    if (!window.confirm("Deseja realmente remover TODOS os créditos deste lead?")) return;
+    
+    setAccessLoading(true);
+    try {
+      // Remove os créditos chamando a nova Edge Function (Bypass de RLS)
+      const { data, error } = await supabase.functions.invoke('manage-credits', {
+        body: { 
+          leadId: selectedLead.id,
+          action: 'remove'
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success("Todos os créditos foram removidos!");
       setShowCreditsModal(false);
       fetchLeads(true);
     } catch (err: any) {
@@ -438,7 +463,7 @@ const AdminPage: React.FC = () => {
                         <td className="py-5 px-4">
                           <div className="flex items-center justify-center gap-3">
                             <ActionButton onClick={() => handleOpenAccessModal(lead)} icon={Key} color="text-purple-400" title="Gerenciar Acesso" />
-                            <ActionButton onClick={() => { setSelectedLead(lead); setCreditAmount(49.50); setShowCreditsModal(true); }} icon={Coins} color="text-yellow-400" title="Adicionar Créditos" />
+                            <ActionButton onClick={() => { setSelectedLead(lead); setCreditAmount(49.50); setShowCreditsModal(true); }} icon={Coins} color="text-yellow-400" title="Adicionar/Remover Créditos" />
                             <ActionButton onClick={() => { setSelectedLead(lead); setShowPixModal(true); setGeneratedPix(null); }} icon={QrCode} color="text-yellow-500" title="Gerar PIX" />
                             <ActionButton onClick={() => window.open(`https://wa.me/55${lead.phone?.replace(/\D/g, '')}`, '_blank')} icon={MessageCircle} color="text-green-500" title="WhatsApp" />
                             <ActionButton onClick={() => handleDeleteLead(lead.id)} icon={Trash2} color="text-red-500" title="Excluir Lead" />
@@ -631,7 +656,7 @@ const AdminPage: React.FC = () => {
               <div className="p-8 flex justify-between items-center bg-[#0f0f12] border-b border-white/5">
                 <div>
                   <h3 className="text-xl font-black text-white uppercase tracking-tighter">Gerenciar Créditos</h3>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Injetar Créditos Manualmente</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Injetar ou Remover Créditos</p>
                 </div>
                 <button onClick={() => setShowCreditsModal(false)} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors"><X size={20} /></button>
               </div>
@@ -646,7 +671,7 @@ const AdminPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1 block">Selecione o Pacote de Créditos</label>
+                  <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1 block">Selecione o Pacote de Créditos para Adicionar</label>
                   
                   <div className="space-y-3">
                     <button 
@@ -693,17 +718,31 @@ const AdminPage: React.FC = () => {
                   </div>
                 </div>
 
-                <button 
-                  onClick={handleAddCredits}
-                  disabled={accessLoading}
-                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-yellow-500/20 active:scale-95 transition-all text-xs uppercase tracking-widest"
-                >
-                  {accessLoading ? (
-                    <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  ) : (
-                    <><Check size={14} /> Injetar Créditos</>
-                  )}
-                </button>
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    onClick={handleRemoveCredits}
+                    disabled={accessLoading}
+                    className="w-full bg-red-600/10 border border-red-500/20 hover:bg-red-600/20 text-red-500 font-black py-4 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-widest"
+                  >
+                    {accessLoading ? (
+                      <div className="w-5 h-5 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
+                    ) : (
+                      <><Trash2 size={14} /> Limpar Saldo</>
+                    )}
+                  </button>
+
+                  <button 
+                    onClick={handleAddCredits}
+                    disabled={accessLoading}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-yellow-500/20 active:scale-95 transition-all text-xs uppercase tracking-widest"
+                  >
+                    {accessLoading ? (
+                      <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                    ) : (
+                      <><Check size={14} /> Injetar Saldo</>
+                    )}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
