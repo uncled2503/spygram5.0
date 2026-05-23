@@ -27,9 +27,24 @@ serve(async (req) => {
 
     console.log(`[manage-credits] Ação: ${action} para o lead: ${leadId}`);
 
+    if (action === 'get') {
+      // Retorna todos os pagamentos vinculados ao lead ignorando RLS
+      const { data: payments, error } = await supabase
+        .from('payments')
+        .select('status, payload')
+        .eq('lead_id', leadId);
+
+      if (error) throw error;
+
+      return new Response(JSON.stringify({ payments }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      })
+    }
+
     if (action === 'add') {
-      // Adiciona um registro de crédito aprovado
-      const { error } = await supabase
+      // 1. Adiciona um registro de crédito aprovado
+      const { error: insertError } = await supabase
         .from('payments')
         .insert({
           transaction_id: `MANUAL-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -38,8 +53,17 @@ serve(async (req) => {
           payload: { amount: parseFloat(amount) }
         });
 
-      if (error) throw error;
-      console.log(`[manage-credits] Créditos de R$ ${amount} adicionados com sucesso.`);
+      if (insertError) throw insertError;
+
+      // 2. Garante que o status do lead esteja como 'pagou' para liberar o painel
+      const { error: leadError } = await supabase
+        .from('leads')
+        .update({ status: 'pagou' })
+        .eq('id', leadId);
+
+      if (leadError) throw leadError;
+
+      console.log(`[manage-credits] Créditos de R$ ${amount} adicionados e lead liberado.`);
       return new Response(JSON.stringify({ success: true, message: 'Créditos adicionados com sucesso!' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

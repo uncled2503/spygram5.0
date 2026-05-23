@@ -27,15 +27,17 @@ const AppHeader: React.FC = () => {
           if (lead.status === 'pagou') {
             setIsPaid(true);
 
-            // Busca os pagamentos aprovados associados a este lead
-            const { data: paymentsData } = await supabase
-              .from('payments')
-              .select('status, payload')
-              .eq('lead_id', lead.id);
+            // Busca os pagamentos aprovados por meio da Edge Function (bypass de RLS)
+            const { data: edgeData, error: edgeError } = await supabase.functions.invoke('manage-credits', {
+              body: { leadId: lead.id, action: 'get' }
+            });
 
+            if (edgeError) throw edgeError;
+
+            const paymentsData = edgeData?.payments || [];
             const successStatuses = ['paid', 'saquepago', 'approved', 'success', 'pago'];
             
-            const creditPayments = paymentsData?.filter(p => {
+            const creditPayments = paymentsData.filter((p: any) => {
               const isSuccess = successStatuses.includes(String(p.status).toLowerCase());
               const payAmt = Number(p.payload?.amount) || 0;
               // Somente valores exatos dos pacotes de recarga de créditos
@@ -44,7 +46,7 @@ const AppHeader: React.FC = () => {
 
             if (creditPayments.length > 0) {
               let maxCredits: string | number = 0;
-              creditPayments.forEach(p => {
+              creditPayments.forEach((p: any) => {
                 const payAmt = Number(p.payload?.amount) || 0;
                 if (payAmt === 149.00) {
                   maxCredits = 'Ilimitado';
