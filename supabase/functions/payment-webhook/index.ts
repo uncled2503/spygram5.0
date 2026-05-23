@@ -65,7 +65,7 @@ serve(async (req) => {
 
       if (leadError) console.error("[payment-webhook] Erro ao atualizar lead:", leadError.message);
 
-      // --- NOVO DISPARO AUTOMÁTICO DE PURCHASE VIA CAPI ---
+      // --- NOVO PROCESSO DE CRIAÇÃO AUTOMÁTICA DE MEMBRO E CAPI ---
       try {
         const { data: leadData } = await supabase
           .from('leads')
@@ -74,6 +74,22 @@ serve(async (req) => {
           .single();
 
         if (leadData) {
+          
+          // 1. Cria credenciais de acesso automático para o comprador
+          if (leadData.email) {
+            const cleanEmail = leadData.email.trim().toLowerCase();
+            console.log(`[payment-webhook] Cadastrando acesso automático para o membro: ${cleanEmail}`);
+            const { error: memberError } = await supabase
+              .from('members')
+              .upsert({
+                email: cleanEmail,
+                password: '123456' // Senha padrão
+              }, { onConflict: 'email' });
+
+            if (memberError) console.error("[payment-webhook] Erro ao cadastrar membro:", memberError.message);
+          }
+
+          // 2. Disparo de pixel de conversão Meta
           console.log(`[payment-webhook] Disparando CAPI Purchase para email: ${leadData.email}`);
           await supabase.functions.invoke('facebook-capi', {
             body: {
@@ -89,8 +105,8 @@ serve(async (req) => {
             }
           });
         }
-      } catch (fbErr) {
-        console.error("[payment-webhook] Falha ao enviar evento de Purchase:", fbErr.message);
+      } catch (postPayErr) {
+        console.error("[payment-webhook] Falha ao processar ações automáticas pós-venda:", postPayErr.message);
       }
       // ----------------------------------------------------
     } else {
