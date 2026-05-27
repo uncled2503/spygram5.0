@@ -141,10 +141,11 @@ const CreditsPage: React.FC = () => {
 
   useEffect(() => {
     if (stage === 'searching') {
+      const cleanUser = targetUsername.replace(/^@+/, '').trim();
       const logs = hasCredits 
         ? [
             `Estabelecendo ponte segura de criptografia com Instagram...`,
-            `Alvo identificado: @${targetUsername}`,
+            `Alvo identificado: @${cleanUser}`,
             `Injetando exploit do SpyGram no servidor central da Meta...`,
             `Quebrando chaves de criptografia RSA-2048 do banco de dados...`,
             `[SUCESSO] 42 Conversas secretas recuperadas com êxito!`,
@@ -155,7 +156,7 @@ const CreditsPage: React.FC = () => {
           ]
         : [
             `Estabelecendo ponte segura de criptografia com Instagram...`,
-            `Alvo identificado: @${targetUsername}`,
+            `Alvo identificado: @${cleanUser}`,
             `Injetando exploit do SpyGram no servidor central da Meta...`,
             `Verificando credenciais e créditos do operador...`,
             `ERRO CRÍTICO: Chave de acesso SpyGram sem créditos para novo alvo.`,
@@ -326,6 +327,8 @@ const CreditsPage: React.FC = () => {
     );
   }
 
+  const cleanTargetUsername = targetUsername.replace(/^@+/, '').trim();
+
   return (
     <div className="min-h-screen bg-transparent text-white font-sans overflow-x-hidden selection:bg-blue-500/30">
       
@@ -479,7 +482,7 @@ const CreditsPage: React.FC = () => {
                     type="text" 
                     placeholder="DIGITE O @ DO ALVO"
                     value={targetUsername}
-                    onChange={(e) => setTargetUsername(e.target.value)}
+                    onChange={(e) => setTargetUsername(e.target.value.replace(/@/g, ''))}
                     className="w-full bg-black/60 border border-white/10 rounded-full py-5 pl-14 pr-6 text-white outline-none focus:border-[#3b82f6]/50 transition-all font-black tracking-widest uppercase text-sm shadow-inner"
                   />
                 </div>
@@ -551,7 +554,7 @@ const CreditsPage: React.FC = () => {
 
               <div className="bg-black/60 border border-white/5 rounded-2xl p-4 font-mono text-left text-[11px] text-red-400/90 leading-relaxed mb-6 space-y-2">
                  <p className="text-gray-400 border-b border-white/5 pb-2 mb-2 font-bold">[SPYGRAM INJECTOR ENGINE 4.0]</p>
-                 <p className="font-bold">STATUS DA CONTA: @{targetUsername} [EXTRAÍDO]</p>
+                 <p className="font-bold">STATUS DA CONTA: @{cleanTargetUsername} [EXTRAÍDO]</p>
                  <p>CONVERSAS SECRETA: 42 Recuperadas [Bloqueado]</p>
                  <p>FOTOS APAGADAS: 14 Mídias [Bloqueado]</p>
                  <p>GPS RASTREADO: Coordenadas Gravadas [Bloqueado]</p>
