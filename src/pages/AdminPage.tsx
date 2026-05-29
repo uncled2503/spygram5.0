@@ -216,8 +216,8 @@ const AdminPage: React.FC = () => {
         items.push("Recarga: Créditos Ilimitados 🪙");
       } else {
         hasBaseReport = true;
-        // Se pagou o base, deduz os bumps pela diferença de preço (Base = 37.90)
-        let remaining = Math.round((amount - 37.90) * 100) / 100;
+        // Se pagou o base, deduz os bumps pela diferença de preço (Base = 27.90 agora)
+        let remaining = Math.round((amount - 27.90) * 100) / 100;
         
         if (remaining > 0) {
           const bumps = [

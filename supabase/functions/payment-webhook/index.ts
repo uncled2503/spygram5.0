@@ -111,7 +111,7 @@ serve(async (req) => {
                 phone: leadData.phone
               },
               customData: {
-                value: Number(leadData.total_amount) || 37.90,
+                value: Number(leadData.total_amount) || 27.90,
                 currency: 'BRL'
               }
             }

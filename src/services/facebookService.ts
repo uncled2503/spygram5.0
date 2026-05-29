@@ -9,7 +9,7 @@ export const trackFacebookEvent = async (
   if (typeof (window as any).fbq === 'function') {
     (window as any).fbq('track', eventName, {
       content_name: eventName,
-      value: customData.value || 37.90,
+      value: customData.value || 27.90,
       currency: customData.currency || 'BRL',
     });
     console.log(`[Facebook Pixel] Evento ${eventName} disparado no navegador.`);

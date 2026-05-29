@@ -40,7 +40,7 @@ serve(async (req) => {
           },
           custom_data: {
             currency: customData?.currency || "BRL",
-            value: String(customData?.value || "37.90")
+            value: String(customData?.value || "27.90")
           }
         }
       ]
